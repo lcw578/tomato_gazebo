@@ -1,12 +1,120 @@
 # 阶段二采摘闭环验收记录
 
-## 当前验收结果
+## 当前实测结果
+
+2026-11-20，最终代码在受控单株场景完成连续 3/3 轮原样主控物理动作闭环。每轮均经过原视觉函数、实际进刀接触、严格闭爪、携果回筐、原主控成功开爪和动态落筐。原主控及 `stemGrowthAndPoints.py` 运行前后 SHA-256 核验一致。完整单元测试 64/64 通过，overlay 九个包构建通过。[已提交的测量证据](/data/tomato_gazebo/ros2_gazebo_ws/docs/evidence/stage2_native_harvest_2026-11-20.json) · [本地完整原始数据](/data/tomato_gazebo/ros2_gazebo_ws/validation/stage2/native_acceptance/native_harvest_summary.json)
+
+| 实测项目 | 第 1 轮 | 第 2 轮 | 第 3 轮 |
+| --- | --- | --- | --- |
+| 原算法两次骨架点数 | 168 / 168 | 168 / 168 | 168 / 168 |
+| 剪切点 TCP 误差 | 3.185098 mm | 3.185103 mm | 3.185107 mm |
+| 刀面法向与果梗交角 | 0.248116° | 0.248116° | 0.248116° |
+| 左 / 右指闭爪残差 | 0.000190 / 0.000011 mm | 0.000190 / 0.000011 mm | 0.000190 / 0.000011 mm |
+| 主茎接触次数 | 0 | 0 | 0 |
+| 启动至落筐静置全过程底盘漂移 | 0.00004764 mm | 0.00004786 mm | 0.00004754 mm |
+| 静置窗口最大位置跨度 | 0.429845 mm | 0.408321 mm | 0.451829 mm |
+| 静置窗口最大姿态跨度 | 0.188671° | 0.183277° | 0.197119° |
+| 持续筐内检查的样本数 | 521 | 513 | 545 |
+| 果球筐内包络 | 12 / 12，超界 0 | 12 / 12，超界 0 | 12 / 12，超界 0 |
+
+以上结果对应完整 TCP 平移适配、136 mm 运行时长度、单株合成果梗和 GT 识别。独立单果资产、密植场景及真实 YOLO 的验证范围见下文。原主控内部采摘成功标志存在已确认的注释赋值问题，业务状态处理需要单独解决。[业务状态诊断](/data/tomato_gazebo/robot_ws_fixed-v1.0-master/src/xc_robot_main_control/xc_robot_main_control/xc_robot_main_control_node.py:1975)
+
+## 完整 TCP 补偿与单株验收配置
+
+用户已授权仿真侧完整 TCP 补偿及单株验收场景。原主控通过运行时参数加载 136 mm 工具长度，运动服务采用 `sdk_flange`、1000 count/m 深度和 `sim_gt_yolo_service`。本轮配置基于提交 `83f69b7`。[主控运行配置](/data/tomato_gazebo/ros2_gazebo_ws/src/tomato_sim_gazebo/config/stage2_native_main.yaml:5) · [运动配置](/data/tomato_gazebo/ros2_gazebo_ws/src/tomato_sim_gazebo/config/stage2_native_motion.yaml:5)
+
+### 工具参考点适配
+
+当前 CAD 的 wrist3 至刀口向量为 `[-4.4,-4.9,135.952] mm`。136 mm 标量补偿与它的轴向差为 0.048 mm，横向差为 6.5856 mm。启用 `compensate_native_tool_offset` 后，仿真对 SDK 请求的中间点与终点同时增加 `R × ([0,0,0.136] − p_wrist_to_tcp)`，再求解法兰运动。因此仿真实际执行的法兰平移包含显式校正，`/arm_status` 回报实际法兰位姿。[补偿实现](/data/tomato_gazebo/ros2_gazebo_ws/src/tomato_sim_adapters/tomato_sim_adapters/sim_aubo_motion_service.py:250)
+
+横向偏置可追溯到旧装配工具里的 `TCP_BASE=[-4.9,-4.4,-85] mm`，经固定座旋转得到当前腕部向量。完整刀片网格的刀面 X 约为 −4.897326 mm，与参考 X 相差 0.002674 mm。TCP 的 Y=−4.4 mm 位于刀槽范围 `[−7.5,2.5] mm` 内，距刀槽几何中点 −2.5 mm 为 1.9 mm。该点承接历史接触 TCP 定义，真实工具的绝对偏心仍需实物测量确认。[参考装配](/data/robot_assembly/tools/scene_assets.py:15) · [刀口定义](/data/tomato_gazebo/ros2_gazebo_ws/src/tomato_sim_description/urdf/tomato_picker_full.urdf.xacro:115)
+
+该开关在节点启动时读取。启动参数按内置缺省值、`motion_config`、显式 launch 参数依次覆盖，因此加载本轮配置后，`compensate_native_tool_offset:=false` 可关闭补偿。原有调用入口的缺省值为关闭。[参数加载](/data/tomato_gazebo/ros2_gazebo_ws/src/tomato_sim_gazebo/launch/phase2.launch.py:46)
+
+### 单株场景与运动路径
+
+验收场景保留一个目标植株及其实体主茎，配置一个可剪离果串。果梗采用直径 5 mm、长度 240 mm 的直圆柱，两段各 120 mm，剪切真值取几何中点。果梗世界方位角为 −32°、仰角为 −20°，沿 +X 侧伸并向下倾斜。该几何为本轮选择的受控验收样例。[生成器](/data/tomato_gazebo/ros2_gazebo_ws/scripts/prepare_side_peduncle_world.py:50)
+
+目标载荷沿用原果串的视觉网格、12 个果球碰撞体及 0.15 kg 总质量。释放后恢复刚体接触与重力。质量分配采用既有均匀密度假设。本轮验证范围为单株、单个果串载荷和 GT 识别，独立单果资产、完整 v4 密植环境、真实 YOLO 与真机工具绝对几何仍待各自验收。
+
+进刀前增加仿真关节绕行点，以避免 OEM 初始位姿直达中间点时碰到主茎。携果回筐经过绕行、OEM 零位、侧向点和低位释放，释放时将果串长轴对齐果筐长边。离线 FCL 检查覆盖 1374 个关节离散样本，最大采样步长 0.012 rad，最小间隙 10.2552 mm，下落路径扫描的机器人干涉数为 0。该结果对应本轮站位 1.25 m、升降 0.85 m、相机偏航 32° 和指定路点。[运动配置](/data/tomato_gazebo/ros2_gazebo_ws/src/tomato_sim_gazebo/config/stage2_native_motion.yaml:9) · [离线扫掠证据](/data/tomato_gazebo/ros2_gazebo_ws/validation/stage2/single_plant_oblique/verified_route_long_y.json)
+
+### 原样主控验收流程
+
+每轮在局部复原后启动原主控进程，由原主控完成识别匹配、骨架提取、两段进刀、闭爪、退刀、回筐和开爪。仲裁器必须记录实际刀片与指定果梗接触、`CUT_SUCCESS`、`HELD_BY_GRIPPER` 和动态 `RELEASED`。验收脚本等待严格到位的开爪事件和原主控“末端执行器打开成功”日志，随后结束该轮主控进程、停止巡航，再等待仲裁器完成动态释放与物理静置。这样每轮物理观察都具有固定的果筐参考系。漂移验收同时覆盖主控动作期间及后续静置窗口。[验收脚本](/data/tomato_gazebo/ros2_gazebo_ws/scripts/stage2_native_harvest_checks.py:82)
+
+静置采用连续至少 0.5 s 仿真时间的采样窗口，窗口内任意两帧位置差不超过 1 mm、姿态差不超过 0.5°，每个样本的全部 12 个果球均在筐内。瞬时线速度须小于 0.02 m/s、角速度小于 0.5 rad/s。果球边界检查保留 2 mm 数值接触容差，结果同时记录实际超界量。本轮增加的姿态与窗口门限属于仿真验收选值。[静置检查](/data/tomato_gazebo/ros2_gazebo_ws/scripts/phase3_checks.py:278)
+
+ODE 接触抖动的 10 s、50 样本专项采样中，位置范围为 `[1.541,0.622,0.0467] mm`，相对起点最大姿态变化 0.204°，瞬时角速度最大 0.273 rad/s、中位数 0.102 rad/s。只用 0.1 rad/s 瞬时角速度门限曾在 120 s 后超时，最终判据采用上述速度上限与位姿范围联合检查。[抖动原始数据](/data/tomato_gazebo/ros2_gazebo_ws/validation/stage2/jitter_probe.json)
+
+此前尝试发现过主茎路径干涉、果串搭在筐沿、开爪事件异步观察竞态和删除重建竞态，分别通过仿真路点、释放朝向、等待开爪观察及等待 Gazebo 模型列表确认删除处理。旧的仅线速度静置结果保留为历史数据，最终重复验收使用包含角速度、窗口位姿和逐样本包络的判据。[局部复原](/data/tomato_gazebo/ros2_gazebo_ws/scripts/stage2_reset_payload.py:38) · [回归用例](/data/tomato_gazebo/ros2_gazebo_ws/tests/test_native_acceptance.py)
+
+原主控开爪成功后会恢复巡航。一次复测中，等待仲裁器 `RELEASED` 后才结束主控，造成落筐期间果筐世界 X 移动约 22.3 mm。最终脚本在原主控报告开爪成功后结束本轮进程，并对从主控启动到静置结束的轨道漂移再次设限为 0.5 mm。
+
+### 原主控业务成功标志
+
+启用末端执行器时，`gripper_callback_open()` 中的 `self.is_picking_success=True` 被注释。成功开爪会清零反馈与尝试计数，并结束本串等待，成功标志维持初始化的 False。后续主循环据此将已处理配对加入失败列表。该现有业务状态缺陷由源代码与复测日志共同确认，本轮物理验收分别记录剪切、回筐和开爪成功证据。此项需要在真机业务代码维护范围内另行解决。[开爪回调](/data/tomato_gazebo/robot_ws_fixed-v1.0-master/src/xc_robot_main_control/xc_robot_main_control/xc_robot_main_control_node.py:1965) · [失败列表处理](/data/tomato_gazebo/robot_ws_fixed-v1.0-master/src/xc_robot_main_control/xc_robot_main_control/xc_robot_main_control_node.py:1521) · [复测日志](/data/tomato_gazebo/ros2_gazebo_ws/validation/stage2/native_verified/run_02/native_main.log)
+
+### 完整闭环复现
+
+先构建 overlay，再生成受控场景并启动 Gazebo。以下命令的工作目录为 `/data/tomato_gazebo/ros2_gazebo_ws`，各终端加载相同环境。
+
+```bash
+source /opt/ros/humble/setup.bash
+./build_overlay.sh
+source .overlay/install/local_setup.bash
+export ROS_DOMAIN_ID=138 ROS_LOCALHOST_ONLY=1
+export GAZEBO_IP=127.0.0.1 GAZEBO_MASTER_URI=http://127.0.0.1:11738
+python3 scripts/prepare_side_peduncle_world.py \
+  --output validation/stage2/single_plant_oblique \
+  --direction positive-x --azimuth-offset-deg -32 --single-plant
+ros2 launch tomato_sim_gazebo phase2.launch.py \
+  world:=$PWD/validation/stage2/single_plant_oblique/tomato_corridor_v4_phase3.world \
+  slide_initial:=1.25 lift_height:=0.85 \
+  camera_angle_deg:=32 camera_tilt_deg:=0 camera_hfov_deg:=70 \
+  gui:=false self_collide:=true left_camera:=false \
+  right_camera:=true hand_camera:=false camera_rate:=5 \
+  active_camera_side:=right remote_depth_units_per_metre:=1000 \
+  motion_config:=$PWD/src/tomato_sim_gazebo/config/stage2_native_motion.yaml
+```
+
+第二个终端生成与本次装配对应的 SDK 基座相机外参，启动 GT 识别服务。
+
+```bash
+source /opt/ros/humble/setup.bash
+source .overlay/install/local_setup.bash
+export ROS_DOMAIN_ID=138 ROS_LOCALHOST_ONLY=1
+python3 scripts/prepare_phase4_calibration.py \
+  validation/stage2/calibration_sdk --pose-reference sdk_flange \
+  --ros-args -p use_sim_time:=true
+python3 -m tomato_sim_adapters.sim_gt_yolo_service --ros-args \
+  -p use_sim_time:=true -p depth_units_per_metre:=1000 \
+  -p scene_file:=$PWD/validation/stage2/single_plant_oblique/phase3_scene.json \
+  -p evidence_file:=$PWD/validation/stage2/single_plant_oblique/gt_recheck.json
+```
+
+第三个终端执行连续三轮。脚本读取指定场景与运动配置，核对运行参数，记录原主控源文件哈希。输出目录保存每轮原主控日志、仲裁器日志和 JSON 证据。
+
+```bash
+source /opt/ros/humble/setup.bash
+source .overlay/install/local_setup.bash
+export ROS_DOMAIN_ID=138 ROS_LOCALHOST_ONLY=1
+python3 scripts/stage2_native_harvest_checks.py \
+  --scene-file validation/stage2/single_plant_oblique/phase3_scene.json \
+  --motion-config src/tomato_sim_gazebo/config/stage2_native_motion.yaml \
+  --calibration-dir validation/stage2/calibration_sdk \
+  --output validation/stage2/native_recheck --runs 3
+```
+
+上一轮已停在本配置释放位姿时，加 `--exit-basket` 可先按已核验的空爪路径返回初始位姿，再局部复原目标。该路径的起点会与实测六关节角比较，容差为 0.08 rad。[复原入口](/data/tomato_gazebo/ros2_gazebo_ws/scripts/stage2_reset_payload.py:18)
+
+## 完整 TCP 适配前的验收记录
 
 真值驱动采摘完成两轮局部重置复测，两轮均经过实际刀片接触、严格闭爪、持果运输、动态释放和全果实体筐内静置。原样真机主控首次运行收到 GT 识别响应后，在 `/move_to_pose` 取得 `30003` 逆解失败。后续核对发现仿真桥接的 TCP 解释与硬件 SDK 法兰接口有差异，已增加 SDK 对齐模式并同步相机外参。该模式下原请求的中间点和目标点离线逆解通过，在线法兰位置反馈与关节 FK 一致。[首轮实测汇总](/data/tomato_gazebo/ros2_gazebo_ws/docs/evidence/stage2_harvest_2026-11-20.json) · [SDK 对齐核验](/data/tomato_gazebo/ros2_gazebo_ws/docs/evidence/stage2_wrist_reference_2026-11-20.json)
 
-SDK 对齐后尚未执行新的原主控运动周期。当前模型复算的刀口距剪切点为 34.3574 mm，刀片法向与果梗轴线夹角为 88.4162°，仍超出 5 mm 与 30° 的剪切条件。完整原主控采摘入筐成功周期为 0，3–5 次重复验收待完成。
+提交 `83f69b7` 时，SDK 对齐后尚未执行新的原主控运动周期。当时模型复算的刀口距剪切点为 34.3574 mm，刀片法向与果梗轴线夹角为 88.4162°，超出 5 mm 与 30° 的剪切条件。当时完整原主控采摘入筐成功周期为 0。
 
-## 执行基准
+## 历史执行基准
 
 本轮工作基于提交 `933efbd`，分支为 `codex/harvest-closure-stage2`。恢复点为标签 `geometry-actuators-2026-11-20`。机械臂安装采用用户确认的 180° 朝向，底盘沿轨运动采用 `machine_slide`。
 

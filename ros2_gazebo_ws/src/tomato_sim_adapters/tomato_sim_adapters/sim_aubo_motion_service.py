@@ -24,14 +24,14 @@ from xc_interfaces.srv import MoveJoints, MoveToPose
 from .arm_kinematics import ArmKinematics, BOUND, JOINTS, OEM_HOME
 
 
-def parse_box_waypoints(values):
+def parse_box_waypoints(values, name='box_waypoints_rad'):
     if values is None:
         return np.empty((0, 6))
     points = np.asarray(values, dtype=float)
     if points.ndim != 1 or points.size % 6:
-        raise ValueError('box_waypoints_rad must contain six joint angles per waypoint')
+        raise ValueError(f'{name} must contain six joint angles per waypoint')
     if not np.isfinite(points).all() or np.any(np.abs(points) > BOUND):
-        raise ValueError('box_waypoints_rad must contain finite joint angles within AUBO limits')
+        raise ValueError(f'{name} must contain finite joint angles within AUBO limits')
     return points.reshape((-1, 6))
 
 
@@ -102,6 +102,9 @@ class SimArm(Node):
         route = self.declare_parameter(
             'box_waypoints_rad', rclpy.Parameter.Type.DOUBLE_ARRAY).value
         self.box_waypoints = parse_box_waypoints(route)
+        pick_route = self.declare_parameter(
+            'pick_waypoints_rad', rclpy.Parameter.Type.DOUBLE_ARRAY).value
+        self.pick_waypoints = parse_box_waypoints(pick_route, 'pick_waypoints_rad')
         self.tf = Buffer()
         self.tf_listener = TransformListener(self.tf, self)
         self.gripper_length = self.declare_parameter('request_gripper_length', 0.0).value
@@ -110,6 +113,15 @@ class SimArm(Node):
         self.pose_reference = self.declare_parameter('pose_reference', 'tcp').value
         if self.pose_reference not in ('tcp', 'sdk_flange'):
             raise ValueError('pose_reference must be tcp or sdk_flange')
+        self.compensate_native_tool_offset = self.declare_parameter(
+            'compensate_native_tool_offset', False).value
+        if self.compensate_native_tool_offset:
+            if self.pose_reference != 'sdk_flange' or self.gripper_length <= 0.0:
+                raise ValueError('Native tool compensation requires sdk_flange and a positive '
+                                 'request_gripper_length')
+            self.get_logger().info(
+                'Native tool compensation enabled: SDK flange requests are translated '
+                'to align the CAD tool TCP with the native scalar tool offset')
         self.state_lock = threading.Condition()
         self.q = None
         self.velocity = None
@@ -243,6 +255,11 @@ class SimArm(Node):
             sdk_request = self.pose_reference == 'sdk_flange'
             midpoint, target, rotation = (sdk_waypoints(request) if sdk_request
                                           else waypoints(request, self.gripper_length))
+            if sdk_request and self.compensate_native_tool_offset:
+                correction = rotation * (kdl.Vector(0.0, 0.0, self.gripper_length)
+                                         - self.kin.wrist_to_tcp.p)
+                midpoint = midpoint + np.array(list(correction))
+                target = target + np.array(list(correction))
             inverse = self.kin.ik_sdk if sdk_request else self.kin.ik_tcp
             forward = self.kin.fk_sdk if sdk_request else self.kin.fk_tcp
             q = self.current()
@@ -270,7 +287,7 @@ class SimArm(Node):
                 self.approaching = False
                 self.x1 = False
                 self.midpoint.publish(MidpointReached(reached=False))
-                self.execute([q])
+                self.execute([*self.pick_waypoints, q])
                 self.midpoint_q = q
                 self.approach_q = []
                 self.midpoint.publish(MidpointReached(reached=True))

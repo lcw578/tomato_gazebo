@@ -30,11 +30,6 @@ from simulation_config import harvest_launch_defaults, load_configuration, works
 RAIL_TRAVEL_SPEED_MM_S = 100
 
 WORKSPACE = workspace()
-SCENE = json.loads((WORKSPACE / 'validation/phase3/phase3_scene.json').read_text())
-TARGET = np.array(SCENE['cut_point_world'], dtype=float)
-TANGENT = np.array(SCENE['peduncle_tangent_world'], dtype=float)
-STEM_POINT = np.array(SCENE['main_stem_probe_world'])
-STEM_TANGENT = np.array(SCENE['main_stem_tangent_world'])
 
 
 def unit(vector):
@@ -67,13 +62,20 @@ def image_array(message):
 
 
 class Phase3Checks(Node):
-    def __init__(self, output):
+    def __init__(self, output, scene_file=None):
+        self.scene_file = Path(scene_file) if scene_file else (
+            WORKSPACE / 'validation/phase3/phase3_scene.json')
+        self.scene = json.loads(self.scene_file.read_text())
+        self.target = np.array(self.scene['cut_point_world'], dtype=float)
+        self.tangent = np.array(self.scene['peduncle_tangent_world'], dtype=float)
+        self.stem_point = np.array(self.scene['main_stem_probe_world'])
+        self.stem_tangent = np.array(self.scene['main_stem_tangent_world'])
         super().__init__('verify_phase3', parameter_overrides=[Parameter('use_sim_time', value=True)])
         self.output = Path(output)
         self.output.mkdir(parents=True, exist_ok=True)
-        self.summary = {'phase': 3, 'target': SCENE['target_model'], 'checks': {}, 'stage_times_s': {},
-                        'baseline_id': SCENE['baseline_id'], 'source_world': SCENE['source_world'],
-                        'source_world_sha256': SCENE['source_world_sha256']}
+        self.summary = {'phase': 3, 'target': self.scene['target_model'], 'checks': {}, 'stage_times_s': {},
+                        'baseline_id': self.scene['baseline_id'], 'source_world': self.scene['source_world'],
+                        'source_world_sha256': self.scene['source_world_sha256']}
         self.tf = Buffer()
         self.tf_listener = TransformListener(self.tf, self)
         self.joints = {}
@@ -273,25 +275,63 @@ class Phase3Checks(Node):
     def return_to_box_pose(self):
         self.call(self.return_box, MoveToPose.Request(), 'return to basket', timeout=300)
 
-    def settled_payload(self, timeout=60, model_name=None):
+    def settled_payload(self, timeout=60, model_name=None, containment_check=None):
         deadline = time.monotonic() + timeout
         stable_since = None
+        samples = []
         while time.monotonic() < deadline:
-            state = self.entity_state(model_name or SCENE['target_model'])
+            state = self.entity_state(model_name or self.scene['target_model'])
             velocity = state.twist.linear
             speed = math.sqrt(velocity.x**2 + velocity.y**2 + velocity.z**2)
+            angular = state.twist.angular
+            angular_speed = math.sqrt(angular.x**2 + angular.y**2 + angular.z**2)
+            containment = containment_check(state) if containment_check else None
             now = self.get_clock().now().nanoseconds / 1e9
-            if speed < 0.02:
+            pose = state.pose
+            position = [pose.position.x, pose.position.y, pose.position.z]
+            quaternion = [pose.orientation.x, pose.orientation.y,
+                          pose.orientation.z, pose.orientation.w]
+            position_change = rotation_change = 0.
+            if samples:
+                for sample in samples:
+                    distance = math.dist(position, sample['position_world_m'])
+                    dot = abs(sum(a*b for a, b in zip(quaternion, sample['rotation_world_xyzw'])))
+                    angle = math.degrees(2 * math.acos(min(1., dot)))
+                    position_change = max(position_change, distance)
+                    rotation_change = max(rotation_change, angle)
+                if position_change > .001 or rotation_change > .5:
+                    stable_since = None
+                    samples.clear()
+                    position_change = rotation_change = 0.
+            if speed < 0.02 and angular_speed < 0.5 and (containment is None or containment['inside']):
                 if stable_since is None:
                     stable_since = now
+                samples.append({
+                    'sim_time_s': now, 'linear_speed_m_s': speed,
+                    'angular_speed_rad_s': angular_speed,
+                    'position_world_m': position, 'rotation_world_xyzw': quaternion,
+                    'position_change_m': position_change, 'rotation_change_deg': rotation_change,
+                    'containment': containment})
                 if now - stable_since >= 0.5:
                     return state, {'linear_speed_m_s': speed,
+                                   'angular_speed_rad_s': angular_speed,
+                                   'linear_speed_limit_m_s': .02,
+                                   'angular_speed_limit_rad_s': .5,
+                                   'position_change_limit_m': .001,
+                                   'rotation_change_limit_deg': .5,
+                                   'maximum_position_change_m': max(
+                                       sample['position_change_m'] for sample in samples),
+                                   'maximum_rotation_change_deg': max(
+                                       sample['rotation_change_deg'] for sample in samples),
                                    'stable_sim_duration_s': now - stable_since,
-                                   'sample_sim_time_s': now}
+                                   'sample_sim_time_s': now, 'samples': samples}
             else:
                 stable_since = None
+                samples.clear()
             rclpy.spin_once(self, timeout_sec=0.05)
-        raise RuntimeError('Released fruit did not settle below 0.02 m/s for 0.5 simulated seconds')
+        raise RuntimeError('Released fruit did not stay within 1 mm and 0.5 degrees, '
+                           'below 0.02 m/s and 0.5 rad/s, and within the required '
+                           'containment for 0.5 simulated seconds')
 
     def camera_snapshot(self):
         self.wait_for(lambda: self.rgb is not None and self.depth is not None and self.info is not None,
@@ -337,19 +377,19 @@ class Phase3Checks(Node):
                       'simulator and camera ready', timeout=90)
         self.set_slide(rail_station)
         self.assert_home_start()
-        before_state = self.entity_state(SCENE['target_model'])
+        before_state = self.entity_state(self.scene['target_model'])
         before = self.camera_snapshot()
         fruit_before = pose_from_entity(before_state)
         # Miss case: 35 mm away from the cut location must not enable X1 or detach fruit.
-        miss_request, miss_error = self.move_to(TARGET + TANGENT * 0.035, TANGENT)
+        miss_request, miss_error = self.move_to(self.target + self.tangent * 0.035, self.tangent)
         miss_tcp, _ = self.world_tcp_transform()
-        miss_cutpoint_error = float(np.linalg.norm(miss_tcp - TARGET))
+        miss_cutpoint_error = float(np.linalg.norm(miss_tcp - self.target))
         x1_at_miss = any(value == 1 for _, value in self.x1_values[-20:])
         self.command_gripper('close')
         self.wait_for(lambda: any(item.get('event') == 'CUT_MISS'
                                   for item in json.loads((WORKSPACE / 'validation/phase3_runtime.json').read_text()).get('cut_attempts', [])),
                       'miss arbitration', timeout=5)
-        miss_state = pose_from_entity(self.entity_state(SCENE['target_model']))
+        miss_state = pose_from_entity(self.entity_state(self.scene['target_model']))
         self.summary['checks']['negative_misaligned'] = {
             'requested_pose_error_m': miss_error,
             'tcp_cutpoint_error_m': miss_cutpoint_error, 'x1': x1_at_miss,
@@ -364,9 +404,9 @@ class Phase3Checks(Node):
         attempt_start = len(json.loads((WORKSPACE / 'validation/phase3_runtime.json').read_text())
                             .get('cut_attempts', []))
         start = time.monotonic()
-        positive_request, tcp_error = self.move_to(TARGET, TANGENT, expect_feedback=2)
+        positive_request, tcp_error = self.move_to(self.target, self.tangent, expect_feedback=2)
         contact_tcp, contact_rotation = self.world_tcp_transform()
-        fruit_at_grasp = pose_from_entity(self.entity_state(SCENE['target_model']))
+        fruit_at_grasp = pose_from_entity(self.entity_state(self.scene['target_model']))
         stem_count_before = json.loads((WORKSPACE / 'validation/phase3_runtime.json').read_text())
         self.command_gripper('close')
         self.wait_for(lambda: json.loads((WORKSPACE / 'validation/phase3_runtime.json').read_text())
@@ -374,7 +414,7 @@ class Phase3Checks(Node):
         self.call(self.retreat, MoveToPose.Request(), 'retract holding fruit', timeout=300)
         self.wait_for(lambda: True if json.loads((WORKSPACE / 'validation/phase3_runtime.json').read_text())
                       .get('state') == 'HELD_BY_GRIPPER' else None, 'held fruit follows TCP')
-        fruit_after_retract = pose_from_entity(self.entity_state(SCENE['target_model']))
+        fruit_after_retract = pose_from_entity(self.entity_state(self.scene['target_model']))
         tcp_after_retract, rotation_after_retract = self.world_tcp_transform()
         expected_fruit = (tcp_after_retract + rotation_after_retract.apply(
             contact_rotation.inv().apply(fruit_at_grasp[0] - contact_tcp)),
@@ -394,7 +434,7 @@ class Phase3Checks(Node):
                                          basket_tf.rotation.z, basket_tf.rotation.w])
         fruit_in_basket = basket_rot.inv().apply(released_state[0] - basket_pos)
         containment = fruit_body_containment(
-            WORKSPACE / 'validation/phase3' / SCENE.get(
+            self.scene_file.parent / self.scene.get(
                 'release_sdf', 'models/phase3_fruit_truss_9_1/model.sdf'),
             (fruit_in_basket, (basket_rot.inv() * released_state[1]).as_quat()))
         in_basket = containment['inside']
@@ -406,7 +446,7 @@ class Phase3Checks(Node):
         self.summary['checks']['positive_harvest'] = {
             'test_result_2': any(result == 2 for _, result in self.feedback[feedback_start:]),
             'tcp_cutpoint_error_m': tcp_error,
-            'tcp_final_error_m': float(np.linalg.norm(contact_tcp - TARGET)),
+            'tcp_final_error_m': float(np.linalg.norm(contact_tcp - self.target)),
             'cut_success': any(item.get('event') == 'CUT_SUCCESS' for item in positive_events),
             'follow_error_m': follow_error,
             'follow_displacement_m': follow_displacement,
@@ -422,7 +462,7 @@ class Phase3Checks(Node):
         # Deliberate stem contact is tested only after the successful positive harvest.
         stem_start = len(self.feedback)
         stem_contacts_before = final_runtime.get('main_stem_contacts', 0)
-        _, stem_tcp_error = self.move_to(STEM_POINT, STEM_TANGENT)
+        _, stem_tcp_error = self.move_to(self.stem_point, self.stem_tangent)
         self.wait_for(lambda: any(result == 3 for _, result in self.feedback[stem_start:]),
                       'main stem feedback result 3', timeout=5)
         final_runtime = json.loads((WORKSPACE / 'validation/phase3_runtime.json').read_text())

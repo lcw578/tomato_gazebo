@@ -1,0 +1,10 @@
+# Runtime overrides for the native main controller and the 136 mm cutter.
+xc_robot_main_control_node:
+  ros__parameters:
+    use_sim_time: true
+    gripper_length: 0.136
+    depth_scale: 0.001
+    is_real_camera_data: true
+    use_moge_depth_estimator: false
+    manage_external_camera_processes: false
+    camera_working_flag: 2

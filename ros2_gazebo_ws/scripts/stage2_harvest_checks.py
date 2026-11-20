@@ -9,7 +9,7 @@ import rclpy
 from scipy.spatial.transform import Rotation
 from xc_interfaces.srv import MoveToPose
 
-from phase3_checks import Phase3Checks, SCENE, TARGET, TANGENT, WORKSPACE, pose_from_entity
+from phase3_checks import Phase3Checks, WORKSPACE, pose_from_entity
 from tomato_sim_adapters.harvest_physics_arbiter import fruit_body_containment
 from tomato_sim_adapters.sim_gripper_node import CLOSED_RAD, FINGER_MULTIPLIERS
 
@@ -33,13 +33,13 @@ class TruthHarvestChecks(Phase3Checks):
         self.set_home()
         before = self.runtime()
         feedback_start = len(self.feedback)
-        self.move_to(TARGET, TANGENT, expect_feedback=2)
+        self.move_to(self.target, self.tangent, expect_feedback=2)
         self.wait_for(lambda: self.x1_values and self.x1_values[-1][1] == 1,
                       'gripper input X1 at the cut point', timeout=5)
         x1_at_cut = self.x1_values[-1][1]
         result_2 = any(value == 2 for _, value in self.feedback[feedback_start:])
         tcp_grasp, rotation_grasp = self.world_tcp_transform()
-        fruit_grasp, _ = pose_from_entity(self.entity_state(SCENE['target_model']))
+        fruit_grasp, _ = pose_from_entity(self.entity_state(self.scene['target_model']))
         self.command_gripper('close')
         self.wait_for(lambda: self.runtime().get('state') == 'HELD_BY_GRIPPER',
                       'contact-authorized cut and grasp', timeout=15)
@@ -59,7 +59,7 @@ class TruthHarvestChecks(Phase3Checks):
             now = self.get_clock().now().nanoseconds / 1e9
             if follow_samples and now - follow_samples[-1]['sim_time_s'] < 0.05:
                 return None
-            position, _ = pose_from_entity(self.entity_state(SCENE['target_model']))
+            position, _ = pose_from_entity(self.entity_state(self.scene['target_model']))
             error = float(np.linalg.norm(position - expected))
             follow_samples.append({'sim_time_s': self.get_clock().now().nanoseconds / 1e9,
                                    'position_world_m': position.tolist(), 'error_m': error})
@@ -68,7 +68,7 @@ class TruthHarvestChecks(Phase3Checks):
         fruit_retracted = self.wait_for(payload_reached_retreat,
                                         'payload follows the stopped TCP', timeout=5)
         self.return_to_box_pose()
-        before_release = self.entity_state(SCENE['target_model'])
+        before_release = self.entity_state(self.scene['target_model'])
         self.command_gripper('open')
         self.wait_for(lambda: self.runtime().get('state') == 'RELEASED',
                       'dynamic payload release', timeout=30)
@@ -82,15 +82,15 @@ class TruthHarvestChecks(Phase3Checks):
         local = basket_rotation.inv().apply(fruit_final - basket_position)
         local_rotation = (basket_rotation.inv() * fruit_rotation).as_quat()
         containment = fruit_body_containment(
-            WORKSPACE / 'validation/phase3' / SCENE.get(
+            WORKSPACE / 'validation/phase3' / self.scene.get(
                 'release_sdf', 'models/phase3_fruit_truss_9_1/model.sdf'),
             (local, local_rotation))
         release_position, _ = pose_from_entity(before_release)
         result = {
             'mode': 'ground_truth_service_drive',
-            'target_model': SCENE['target_model'],
+            'target_model': self.scene['target_model'],
             'rail_station_m': self.joints['machine_slide'],
-            'tcp_cutpoint_error_m': float(np.linalg.norm(tcp_grasp - TARGET)),
+            'tcp_cutpoint_error_m': float(np.linalg.norm(tcp_grasp - self.target)),
             'input_x1_at_cut': x1_at_cut,
             'test_result_2': result_2,
             'finger_closed_residual_m': residuals,

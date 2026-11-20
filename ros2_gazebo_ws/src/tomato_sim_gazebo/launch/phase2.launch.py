@@ -3,7 +3,7 @@ from pathlib import Path
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, OpaqueFunction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
@@ -43,14 +43,28 @@ def generate_launch_description():
         Node(package='tomato_sim_adapters', executable='sim_gripper_node',
              parameters=[use_time], output='screen'),
     ]
-    support.append(Node(package='tomato_sim_adapters', executable='sim_aubo_motion_service',
-                        parameters=[use_time, {
-        'action_timeout_scale': ParameterValue(
-            LaunchConfiguration('action_timeout_scale'), value_type=float),
-        'request_gripper_length': ParameterValue(
-            LaunchConfiguration('request_gripper_length'), value_type=float),
-        'pose_reference': LaunchConfiguration('pose_reference'),
-    }], output='screen'))
+    def motion_service(context):
+        parameters = [use_time, {
+            'action_timeout_scale': 10.0,
+            'request_gripper_length': 0.0,
+            'pose_reference': 'tcp',
+            'compensate_native_tool_offset': False,
+        }]
+        config = LaunchConfiguration('motion_config').perform(context)
+        if config:
+            parameters.append(config)
+        overrides = {}
+        for name, value_type in (
+                ('action_timeout_scale', float), ('request_gripper_length', float),
+                ('pose_reference', str), ('compensate_native_tool_offset', bool)):
+            value = LaunchConfiguration(name).perform(context)
+            if value:
+                overrides[name] = ParameterValue(LaunchConfiguration(name), value_type=value_type)
+        parameters.append(overrides)
+        return [Node(package='tomato_sim_adapters', executable='sim_aubo_motion_service',
+                     parameters=parameters, output='screen')]
+
+    support.append(OpaqueFunction(function=motion_service))
     agv = Node(package='tomato_sim_adapters', executable='sim_agv_control_node',
                parameters=[use_time, {
                    'positive_rfid_m': ParameterValue(LaunchConfiguration('positive_rfid_m'), value_type=float),
@@ -64,12 +78,14 @@ def generate_launch_description():
         DeclareLaunchArgument('right_camera', default_value='true'),
         DeclareLaunchArgument('hand_camera', default_value='true'),
         DeclareLaunchArgument('camera_rate', default_value='15'),
-        DeclareLaunchArgument('action_timeout_scale', default_value='10.0'),
+        DeclareLaunchArgument('action_timeout_scale', default_value=''),
         DeclareLaunchArgument('slide_initial', default_value='0.0'),
         DeclareLaunchArgument('active_camera_side', default_value='left'),
         DeclareLaunchArgument('remote_depth_units_per_metre', default_value='4000'),
-        DeclareLaunchArgument('request_gripper_length', default_value='0.0'),
-        DeclareLaunchArgument('pose_reference', default_value='tcp'),
+        DeclareLaunchArgument('request_gripper_length', default_value=''),
+        DeclareLaunchArgument('pose_reference', default_value=''),
+        DeclareLaunchArgument('compensate_native_tool_offset', default_value=''),
+        DeclareLaunchArgument('motion_config', default_value=''),
         DeclareLaunchArgument('world_record', default_value=''),
         DeclareLaunchArgument('positive_rfid_m', default_value='2.4'),
         DeclareLaunchArgument('negative_rfid_m', default_value='-1.85'),

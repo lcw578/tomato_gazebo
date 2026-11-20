@@ -1,0 +1,877 @@
+{
+  "date": "2026-11-20",
+  "base_commit": "83f69b71fb72012333b78900d2db368f1ee39a1e",
+  "scope": "Controlled single-plant physical harvest with unchanged native main control and GT YOLO",
+  "passed": true,
+  "consecutive_runs": 3,
+  "runs": [
+    {
+      "passed": true,
+      "rail_start_position_m": 1.2499915450793506,
+      "state_transitions": [
+        {
+          "state": "ATTACHED_TO_STEM",
+          "wall_elapsed_s": 0.3393072199978633
+        },
+        {
+          "state": "HELD_BY_GRIPPER",
+          "wall_elapsed_s": 14.70398830200429
+        },
+        {
+          "state": "RELEASED",
+          "wall_elapsed_s": 33.13499006300117
+        }
+      ],
+      "original_skeleton_point_counts": [
+        168,
+        168
+      ],
+      "tcp_cutpoint_error_m": 0.0031850978437038104,
+      "crossing_angle_deg": 0.2481159557792751,
+      "finger_closed_residual_m": {
+        "left": 1.898450067636115e-07,
+        "right": 1.086854938513182e-08
+      },
+      "rail_drift_m": 4.7637573441505765e-08,
+      "rail_drift_through_settling_m": 4.7637573441505765e-08,
+      "basket_containment": {
+        "inside": true,
+        "sphere_count": 12,
+        "tolerance_m": 0.002,
+        "body_bounds_min_m": [
+          -0.1288909636159767,
+          -0.13968082599233872,
+          0.0811066191885912
+        ],
+        "body_bounds_max_m": [
+          -0.017481682449521228,
+          0.13360897146414008,
+          0.15433929108886735
+        ],
+        "interior_bounds_min_m": [
+          -0.15,
+          -0.205,
+          0.025379
+        ],
+        "interior_bounds_max_m": [
+          0.15,
+          0.205,
+          0.154379
+        ],
+        "outside_by_axis_m": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "release": {
+        "model_name": "fruit_truss_9_1_side_positivemx_m20_m32_1_single_released",
+        "dynamics_enabled": true,
+        "sim_time_s": 34.6,
+        "initial_position_world_m": [
+          0.7165617024074685,
+          0.1387349967960353,
+          1.117470406444899
+        ],
+        "initial_rotation_world_xyzw": [
+          0.5011701087280227,
+          -0.4988406926246375,
+          -0.4988309035770241,
+          -0.5011528859897383
+        ]
+      },
+      "native_return_to_box_succeeded": true,
+      "native_gripper_open_succeeded": true,
+      "test_result_2": true,
+      "wall_duration_s": 38.46717802999774,
+      "cut_contact": {
+        "collision": "plant_0_8_1::plant::contact_stalk_fixture_collision",
+        "contact_tool_m": [
+          -0.004777690029596049,
+          -0.004251139918348024,
+          -0.08553240322051421
+        ],
+        "tcp_cutpoint_error_m": 0.0031850978437038104,
+        "crossing_angle_deg": 0.2481159557792751
+      },
+      "cut_attempts": [
+        {
+          "event": "FEEDBACK",
+          "test_result": 2,
+          "tcp_error_m": 0.0031850978032187914,
+          "main_stem_contact": false
+        },
+        {
+          "event": "CUT_SUCCESS",
+          "tcp_cutpoint_error_m": 0.0031850978437038104,
+          "blade_peduncle_contact": true
+        }
+      ],
+      "main_stem_contacts": 0,
+      "hold_error": null,
+      "settling": {
+        "linear_speed_m_s": 0.01641802693713113,
+        "angular_speed_rad_s": 0.06155670938033199,
+        "linear_speed_limit_m_s": 0.02,
+        "angular_speed_limit_rad_s": 0.5,
+        "position_change_limit_m": 0.001,
+        "rotation_change_limit_deg": 0.5,
+        "maximum_position_change_m": 0.00042984539944945245,
+        "maximum_rotation_change_deg": 0.18867084730825126,
+        "stable_sim_duration_s": 0.5,
+        "sample_sim_time_s": 39.8,
+        "sample_count": 521,
+        "independently_audited_position_span_m": 0.00042984539944945245,
+        "independently_audited_rotation_span_deg": 0.18867084730825126,
+        "maximum_linear_speed_m_s": 0.019421006277335017,
+        "maximum_angular_speed_rad_s": 0.2895776203620518,
+        "all_samples_inside": true,
+        "first_sample": {
+          "sim_time_s": 39.3,
+          "linear_speed_m_s": 0.015570979285157781,
+          "angular_speed_rad_s": 0.05658679463908687,
+          "position_world_m": [
+            0.662061997329511,
+            0.13870983715803642,
+            0.8089754994593881
+          ],
+          "rotation_world_xyzw": [
+            -0.7073098514738628,
+            -0.16216950633039326,
+            -0.25663592033007415,
+            0.638397861541621
+          ],
+          "position_change_m": 0.0,
+          "rotation_change_deg": 0.0,
+          "containment": {
+            "inside": true,
+            "sphere_count": 12,
+            "tolerance_m": 0.002,
+            "body_bounds_min_m": [
+              -0.12839803306697595,
+              -0.13969469918681135,
+              0.081106624370947
+            ],
+            "body_bounds_max_m": [
+              -0.017678124932317036,
+              0.13357851376057922,
+              0.1543392916807919
+            ],
+            "interior_bounds_min_m": [
+              -0.15,
+              -0.205,
+              0.025379
+            ],
+            "interior_bounds_max_m": [
+              0.15,
+              0.205,
+              0.154379
+            ],
+            "outside_by_axis_m": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "last_sample": {
+          "sim_time_s": 39.8,
+          "linear_speed_m_s": 0.01641802693713113,
+          "angular_speed_rad_s": 0.06155670938033199,
+          "position_world_m": [
+            0.6623845849788338,
+            0.13863411608741927,
+            0.8089755341365821
+          ],
+          "rotation_world_xyzw": [
+            -0.7075631041615537,
+            -0.1610604777076698,
+            -0.2576368968280346,
+            0.6379946751679548
+          ],
+          "position_change_m": 0.00042984539944945245,
+          "rotation_change_deg": 0.18867084730825126,
+          "containment": {
+            "inside": true,
+            "sphere_count": 12,
+            "tolerance_m": 0.002,
+            "body_bounds_min_m": [
+              -0.1288909636159767,
+              -0.13968082599233872,
+              0.0811066191885912
+            ],
+            "body_bounds_max_m": [
+              -0.017481682449521228,
+              0.13360897146414008,
+              0.15433929108886735
+            ],
+            "interior_bounds_min_m": [
+              -0.15,
+              -0.205,
+              0.025379
+            ],
+            "interior_bounds_max_m": [
+              0.15,
+              0.205,
+              0.154379
+            ],
+            "outside_by_axis_m": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        }
+      },
+      "raw_evidence": {
+        "validation/stage2/native_acceptance/run_01/native_harvest.json": "64d16de84fdd8eb3eea237f0d15dc6836689576d4d5cad71ad60e9647e817dce",
+        "validation/stage2/native_acceptance/run_01/runtime.json": "e9dc7e853bf6f7d86799789db4f886596ca4876a0bc325d60fd552a6bdaf33ea",
+        "validation/stage2/native_acceptance/run_01/native_main.log": "de6f1ec26ce18624ca318b67e341cacced2f7af1959dfec535153a9e5bd67073",
+        "validation/stage2/native_acceptance/run_01/arbiter.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "passed": true,
+      "rail_start_position_m": 1.2499915444314813,
+      "state_transitions": [
+        {
+          "state": "ATTACHED_TO_STEM",
+          "wall_elapsed_s": 0.3490161310037365
+        },
+        {
+          "state": "HELD_BY_GRIPPER",
+          "wall_elapsed_s": 15.202548025001306
+        },
+        {
+          "state": "RELEASED",
+          "wall_elapsed_s": 33.548559463000856
+        }
+      ],
+      "original_skeleton_point_counts": [
+        168,
+        168
+      ],
+      "tcp_cutpoint_error_m": 0.0031851029559322934,
+      "crossing_angle_deg": 0.24811617236168515,
+      "finger_closed_residual_m": {
+        "left": 1.9022084271798356e-07,
+        "right": 1.1234409118265898e-08
+      },
+      "rail_drift_m": 4.785505369753196e-08,
+      "rail_drift_through_settling_m": 4.785505369753196e-08,
+      "basket_containment": {
+        "inside": true,
+        "sphere_count": 12,
+        "tolerance_m": 0.002,
+        "body_bounds_min_m": [
+          -0.1287426940583527,
+          -0.13968968195112996,
+          0.0811051048919552
+        ],
+        "body_bounds_max_m": [
+          -0.01694681050644502,
+          0.1336089283014527,
+          0.15435149611084742
+        ],
+        "interior_bounds_min_m": [
+          -0.15,
+          -0.205,
+          0.025379
+        ],
+        "interior_bounds_max_m": [
+          0.15,
+          0.205,
+          0.154379
+        ],
+        "outside_by_axis_m": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "release": {
+        "model_name": "fruit_truss_9_1_side_positivemx_m20_m32_1_single_released",
+        "dynamics_enabled": true,
+        "sim_time_s": 83.7,
+        "initial_position_world_m": [
+          0.7165617070350204,
+          0.13873499465812153,
+          1.1174703994828579
+        ],
+        "initial_rotation_world_xyzw": [
+          0.5011701131126218,
+          -0.4988406903456691,
+          -0.49883090296036353,
+          -0.5011528844872458
+        ]
+      },
+      "native_return_to_box_succeeded": true,
+      "native_gripper_open_succeeded": true,
+      "test_result_2": true,
+      "wall_duration_s": 38.869888180008275,
+      "cut_contact": {
+        "collision": "plant_0_8_1::plant::contact_stalk_fixture_collision",
+        "contact_tool_m": [
+          -0.004795435044728902,
+          -0.004251141176211171,
+          -0.08553248631785955
+        ],
+        "tcp_cutpoint_error_m": 0.0031851029559322934,
+        "crossing_angle_deg": 0.24811617236168515
+      },
+      "cut_attempts": [
+        {
+          "event": "FEEDBACK",
+          "test_result": 2,
+          "tcp_error_m": 0.004794899470256263,
+          "main_stem_contact": false
+        },
+        {
+          "event": "CUT_SUCCESS",
+          "tcp_cutpoint_error_m": 0.0031851029559322934,
+          "blade_peduncle_contact": true
+        }
+      ],
+      "main_stem_contacts": 0,
+      "hold_error": null,
+      "settling": {
+        "linear_speed_m_s": 0.017301172671987657,
+        "angular_speed_rad_s": 0.2858008750284973,
+        "linear_speed_limit_m_s": 0.02,
+        "angular_speed_limit_rad_s": 0.5,
+        "position_change_limit_m": 0.001,
+        "rotation_change_limit_deg": 0.5,
+        "maximum_position_change_m": 0.00040832125464825296,
+        "maximum_rotation_change_deg": 0.183276561235697,
+        "stable_sim_duration_s": 0.5,
+        "sample_sim_time_s": 88.9,
+        "sample_count": 513,
+        "independently_audited_position_span_m": 0.000408321254648253,
+        "independently_audited_rotation_span_deg": 0.183276561235697,
+        "maximum_linear_speed_m_s": 0.019434063699842952,
+        "maximum_angular_speed_rad_s": 0.3202783872046276,
+        "all_samples_inside": true,
+        "first_sample": {
+          "sim_time_s": 88.4,
+          "linear_speed_m_s": 0.005126019923980041,
+          "angular_speed_rad_s": 0.3117107638551932,
+          "position_world_m": [
+            0.6631248041878478,
+            0.13864351626813196,
+            0.8090319105256364
+          ],
+          "rotation_world_xyzw": [
+            -0.7073137835491429,
+            -0.16151303366484823,
+            -0.25847690080096697,
+            0.6378169355779927
+          ],
+          "position_change_m": 0.0,
+          "rotation_change_deg": 0.0,
+          "containment": {
+            "inside": true,
+            "sphere_count": 12,
+            "tolerance_m": 0.002,
+            "body_bounds_min_m": [
+              -0.1282761993262165,
+              -0.1396974323751457,
+              0.0810742927485045
+            ],
+            "body_bounds_max_m": [
+              -0.016787484962257782,
+              0.13359328842253862,
+              0.15434170201489075
+            ],
+            "interior_bounds_min_m": [
+              -0.15,
+              -0.205,
+              0.025379
+            ],
+            "interior_bounds_max_m": [
+              0.15,
+              0.205,
+              0.154379
+            ],
+            "outside_by_axis_m": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "last_sample": {
+          "sim_time_s": 88.9,
+          "linear_speed_m_s": 0.017301172671987657,
+          "angular_speed_rad_s": 0.2858008750284973,
+          "position_world_m": [
+            0.6629989464081101,
+            0.13860718129976662,
+            0.8089747145118372
+          ],
+          "rotation_world_xyzw": [
+            -0.707648131913696,
+            -0.16060514840385923,
+            -0.2583920595702588,
+            0.6377096919886593
+          ],
+          "position_change_m": 0.000281473166648032,
+          "rotation_change_deg": 0.1531889351431666,
+          "containment": {
+            "inside": true,
+            "sphere_count": 12,
+            "tolerance_m": 0.002,
+            "body_bounds_min_m": [
+              -0.1287426940583527,
+              -0.13968968195112996,
+              0.0811051048919552
+            ],
+            "body_bounds_max_m": [
+              -0.01694681050644502,
+              0.1336089283014527,
+              0.15435149611084742
+            ],
+            "interior_bounds_min_m": [
+              -0.15,
+              -0.205,
+              0.025379
+            ],
+            "interior_bounds_max_m": [
+              0.15,
+              0.205,
+              0.154379
+            ],
+            "outside_by_axis_m": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        }
+      },
+      "raw_evidence": {
+        "validation/stage2/native_acceptance/run_02/native_harvest.json": "351d40b700f51747d236725ff9dd27e51b19dc2b876e33fe4214869464a0fca4",
+        "validation/stage2/native_acceptance/run_02/runtime.json": "124fd9c77d93d0883ab7aa722a5407081836720fbe514bec0e9950d372d9d50e",
+        "validation/stage2/native_acceptance/run_02/native_main.log": "1c8053c01b4760a1208ae8e6229007705fe6eea5a7269500eded644ed86e70ef",
+        "validation/stage2/native_acceptance/run_02/arbiter.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "passed": true,
+      "rail_start_position_m": 1.2499915434086983,
+      "state_transitions": [
+        {
+          "state": "ATTACHED_TO_STEM",
+          "wall_elapsed_s": 0.34921619499800727
+        },
+        {
+          "state": "HELD_BY_GRIPPER",
+          "wall_elapsed_s": 25.316798389991163
+        },
+        {
+          "state": "RELEASED",
+          "wall_elapsed_s": 43.76527744399209
+        }
+      ],
+      "original_skeleton_point_counts": [
+        168,
+        168
+      ],
+      "tcp_cutpoint_error_m": 0.003185106910153033,
+      "crossing_angle_deg": 0.24811629852384115,
+      "finger_closed_residual_m": {
+        "left": 1.904904370388094e-07,
+        "right": 1.149310851523977e-08
+      },
+      "rail_drift_m": 4.7542128234212555e-08,
+      "rail_drift_through_settling_m": 4.7542128234212555e-08,
+      "basket_containment": {
+        "inside": true,
+        "sphere_count": 12,
+        "tolerance_m": 0.002,
+        "body_bounds_min_m": [
+          -0.1300403998431892,
+          -0.13962789863929315,
+          0.08110211987651807
+        ],
+        "body_bounds_max_m": [
+          -0.01756708134131456,
+          0.13368288849156235,
+          0.15433929158220352
+        ],
+        "interior_bounds_min_m": [
+          -0.15,
+          -0.205,
+          0.025379
+        ],
+        "interior_bounds_max_m": [
+          0.15,
+          0.205,
+          0.154379
+        ],
+        "outside_by_axis_m": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "release": {
+        "model_name": "fruit_truss_9_1_side_positivemx_m20_m32_1_single_released",
+        "dynamics_enabled": true,
+        "sim_time_s": 143.1,
+        "initial_position_world_m": [
+          0.7165617105165356,
+          0.13873499413494478,
+          1.1174703942930386
+        ],
+        "initial_rotation_world_xyzw": [
+          0.5011701150579151,
+          -0.49884068939294374,
+          -0.49883090235063604,
+          -0.5011528840971179
+        ]
+      },
+      "native_return_to_box_succeeded": true,
+      "native_gripper_open_succeeded": true,
+      "test_result_2": true,
+      "wall_duration_s": 49.27674173298874,
+      "cut_contact": {
+        "collision": "plant_0_8_1::plant::contact_stalk_fixture_collision",
+        "contact_tool_m": [
+          -0.004795428051292627,
+          -0.004251142127914331,
+          -0.08553249113800834
+        ],
+        "tcp_cutpoint_error_m": 0.003185106910153033,
+        "crossing_angle_deg": 0.24811629852384115
+      },
+      "cut_attempts": [
+        {
+          "event": "FEEDBACK",
+          "test_result": 2,
+          "tcp_error_m": 0.0031851069033979854,
+          "main_stem_contact": false
+        },
+        {
+          "event": "CUT_SUCCESS",
+          "tcp_cutpoint_error_m": 0.003185106910153033,
+          "blade_peduncle_contact": true
+        }
+      ],
+      "main_stem_contacts": 0,
+      "hold_error": null,
+      "settling": {
+        "linear_speed_m_s": 0.01759449700371616,
+        "angular_speed_rad_s": 0.11831674255528916,
+        "linear_speed_limit_m_s": 0.02,
+        "angular_speed_limit_rad_s": 0.5,
+        "position_change_limit_m": 0.001,
+        "rotation_change_limit_deg": 0.5,
+        "maximum_position_change_m": 0.00045182899444175164,
+        "maximum_rotation_change_deg": 0.19711877215076307,
+        "stable_sim_duration_s": 0.5,
+        "sample_sim_time_s": 148.4,
+        "sample_count": 545,
+        "independently_audited_position_span_m": 0.0004518289944417517,
+        "independently_audited_rotation_span_deg": 0.19711877215076307,
+        "maximum_linear_speed_m_s": 0.019248828295912016,
+        "maximum_angular_speed_rad_s": 0.28624250913838084,
+        "all_samples_inside": true,
+        "first_sample": {
+          "sim_time_s": 147.9,
+          "linear_speed_m_s": 0.019052160389156633,
+          "angular_speed_rad_s": 0.1191919945006486,
+          "position_world_m": [
+            0.6620937605631447,
+            0.13857107112608327,
+            0.808960517949414
+          ],
+          "rotation_world_xyzw": [
+            -0.7077030159690799,
+            -0.16055401134053526,
+            -0.2580776929848552,
+            0.6377889580530117
+          ],
+          "position_change_m": 0.0,
+          "rotation_change_deg": 0.0,
+          "containment": {
+            "inside": true,
+            "sphere_count": 12,
+            "tolerance_m": 0.002,
+            "body_bounds_min_m": [
+              -0.12955339037975694,
+              -0.13964708169426654,
+              0.08111192260308557
+            ],
+            "body_bounds_max_m": [
+              -0.017829678555229333,
+              0.13365031155234838,
+              0.1543484725993799
+            ],
+            "interior_bounds_min_m": [
+              -0.15,
+              -0.205,
+              0.025379
+            ],
+            "interior_bounds_max_m": [
+              0.15,
+              0.205,
+              0.154379
+            ],
+            "outside_by_axis_m": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "last_sample": {
+          "sim_time_s": 148.4,
+          "linear_speed_m_s": 0.01759449700371616,
+          "angular_speed_rad_s": 0.11831674255528916,
+          "position_world_m": [
+            0.6624986322377753,
+            0.13848504354940838,
+            0.8089834913300556
+          ],
+          "rotation_world_xyzw": [
+            -0.7079139154418559,
+            -0.1594224167088,
+            -0.2592786359957765,
+            0.6373515280366686
+          ],
+          "position_change_m": 0.0004281252843653801,
+          "rotation_change_deg": 0.19711877215076307,
+          "containment": {
+            "inside": true,
+            "sphere_count": 12,
+            "tolerance_m": 0.002,
+            "body_bounds_min_m": [
+              -0.1300403998431892,
+              -0.13962789863929315,
+              0.08110211987651807
+            ],
+            "body_bounds_max_m": [
+              -0.01756708134131456,
+              0.13368288849156235,
+              0.15433929158220352
+            ],
+            "interior_bounds_min_m": [
+              -0.15,
+              -0.205,
+              0.025379
+            ],
+            "interior_bounds_max_m": [
+              0.15,
+              0.205,
+              0.154379
+            ],
+            "outside_by_axis_m": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        }
+      },
+      "raw_evidence": {
+        "validation/stage2/native_acceptance/run_03/native_harvest.json": "bc88767f3df88ab036a15b2f769c79ec04132b4b9f38d61d978144dc44c2c6b9",
+        "validation/stage2/native_acceptance/run_03/runtime.json": "aacfa7d8c7263b462b48c2e3b0e21e67ab41ce082de32720d1759de71ccebf4e",
+        "validation/stage2/native_acceptance/run_03/native_main.log": "e0a0eac33908eaf234d479607e35b56050ebb732aef5827f5a34d2a4474d35ce",
+        "validation/stage2/native_acceptance/run_03/arbiter.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "original_source_sha256_before": {
+    "/data/tomato_gazebo/robot_ws_fixed-v1.0-master/src/xc_robot_main_control/xc_robot_main_control/xc_robot_main_control_node.py": "ddedeeccce38916ab5af97a65a684524fc8f4738fd99ba13f8d56547d067b60f",
+    "/data/tomato_gazebo/robot_ws_fixed-v1.0-master/src/xc_robot_main_control/xc_robot_main_control/stemGrowthAndPoints.py": "ebc0b140afcbe7430c70b90bccec452059e65b4f48e44340f1ffd217a6a9e6db"
+  },
+  "original_source_sha256_after": {
+    "/data/tomato_gazebo/robot_ws_fixed-v1.0-master/src/xc_robot_main_control/xc_robot_main_control/xc_robot_main_control_node.py": "ddedeeccce38916ab5af97a65a684524fc8f4738fd99ba13f8d56547d067b60f",
+    "/data/tomato_gazebo/robot_ws_fixed-v1.0-master/src/xc_robot_main_control/xc_robot_main_control/stemGrowthAndPoints.py": "ebc0b140afcbe7430c70b90bccec452059e65b4f48e44340f1ffd217a6a9e6db"
+  },
+  "original_sources_unchanged": true,
+  "motion_parameters": {
+    "use_sim_time": true,
+    "pose_reference": "sdk_flange",
+    "compensate_native_tool_offset": true,
+    "request_gripper_length": 0.136,
+    "action_timeout_scale": 10.0,
+    "pick_waypoints_rad": [
+      2.2,
+      0.2682571060315284,
+      2.339613862298399,
+      2.0429078894593626,
+      1.5119787310026875,
+      0.0
+    ],
+    "box_waypoints_rad": [
+      2.2,
+      0.2682571060315284,
+      2.339613862298399,
+      2.0429078894593626,
+      1.5119787310026875,
+      0.0,
+      0.18011797880581482,
+      0.2682571060315284,
+      2.339613862298399,
+      2.0429078894593626,
+      1.5119787310026875,
+      0.0,
+      1.6,
+      0.2,
+      2.1,
+      2.0429078894593626,
+      1.5119787310026875,
+      -1.043329746825722,
+      2.4473349404987905,
+      1.676805829231638,
+      -1.0794442464514056,
+      1.956155428644455,
+      1.5708145895150771,
+      -1.043329746825722
+    ]
+  },
+  "runtime_main_parameters": {
+    "gripper_length": 0.136,
+    "depth_scale": 0.001,
+    "is_real_camera_data": true,
+    "manage_external_camera_processes": false,
+    "camera_working_flag": 2
+  },
+  "fixture": {
+    "purpose": "side-facing peduncle under unchanged native controller",
+    "direction": "positive-x",
+    "cut_elevation_deg": -20.0,
+    "azimuth_offset_deg": -32.0,
+    "anchor_world_m": [
+      1.1999072523111662,
+      -0.7430214622994747,
+      2.06818037840711
+    ],
+    "anchor_displacement_m": 0.0,
+    "cut_seam_gap_m": 0.0,
+    "fruit_body_world_rigid_transform": [
+      [
+        -0.5299192638890776,
+        0.8480480963714607,
+        0.0,
+        2.609766857248482
+      ],
+      [
+        -0.8480480963714607,
+        -0.5299192638890776,
+        0.0,
+        -0.20909480160590066
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        -0.07808483440105052
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "real_greenhouse_geometry_verified": false,
+    "single_plant": true,
+    "stem_geometry": "straight cylinder, radius 2.5 mm, length 240 mm",
+    "cut_reference": "geometric midpoint of the complete stalk",
+    "stem_tip_world_m": [
+      1.391164341438302,
+      -0.8625321556304125,
+      1.9860955440089496
+    ]
+  },
+  "fixture_integrity": {
+    "original_entities_preserved": 35,
+    "plant_instances_preserved": 1,
+    "all_original_include_poses_unchanged": true,
+    "fixtures_and_track_unchanged": true,
+    "detached_top_level_trusses": 1,
+    "main_stem_sensor_instances": 1,
+    "all_original_entities_present": false
+  },
+  "peduncle_tangent_world": [
+    0.7969045380297319,
+    -0.49796122221224076,
+    -0.3420201433256687
+  ],
+  "cut_point_world_m": [
+    1.295535796874734,
+    -0.8027768089649436,
+    2.02713796120803
+  ],
+  "file_sha256": {
+    "validation/stage2/single_plant_oblique/phase3_scene.json": "9300d7f42841fab353051a1a513f93e0f11c385700b69d2c59d5ec212019776d",
+    "validation/stage2/single_plant_oblique/tomato_corridor_v4_phase3.world": "d6d02359d377ff5d1fd7fdbc83ce00505b74a9668eba2af6f785fb4465a13afa",
+    "validation/stage2/single_plant_oblique/models/phase3_fruit_truss_9_1/model.sdf": "d2d245f14debd10961a25112a75d2fa21be3e82323b1819dfdbec041be14a8c1",
+    "src/tomato_sim_gazebo/config/stage2_native_main.yaml": "a0ede3723428e4ca644aaf77e0885cff26de843565b7c5017a14d1a998e5529e",
+    "src/tomato_sim_gazebo/config/stage2_native_motion.yaml": "46caa8c313cfe689a2b4899941f3f795bdc0364693916a065cfef98e32c465b6",
+    "scripts/stage2_native_harvest_checks.py": "2f2f652a789f2ab3e6d7d541b44411e794e5ff2371f4e1bf5b421d57ceaaca54",
+    "scripts/phase3_checks.py": "2202f79852d02d8b15832b854566d75b7731960348ec474bb073ad24fc7d6ba1",
+    "scripts/stage2_reset_payload.py": "9cad1f492c659dc146facf657a7ee3e28cca1c7433c62a771c21a34599909486",
+    "scripts/prepare_side_peduncle_world.py": "89bfd44de3d692ad6c7a167ee9d3cf5d36bb788c5f1dea7267df68d75f9ac06a",
+    "src/tomato_sim_adapters/tomato_sim_adapters/sim_aubo_motion_service.py": "7c80a93021f0feacb7df1125ce139f10ba1717f34e31f8e3ed453c1552c6c699",
+    "src/tomato_sim_gazebo/launch/phase2.launch.py": "8d7c120e692f410fa5856c6eddaade976c08f4209e173abb0ba9a7d87b3d5b68",
+    "validation/stage2/calibration_sdk/right/calibration_results.txt": "9f0f0afc43dabfe86acf6a73c6408c88f2e21738002b3af191039d6de4a6abbb",
+    "validation/stage2/calibration_sdk/left/calibration_results.txt": "fd873e656f5580554ec59607697338fcf9ff5a4520df084b8bb137357f030b72"
+  },
+  "offline_collision_sweep": {
+    "file": "validation/stage2/single_plant_oblique/verified_route_long_y.json",
+    "sha256": "c64df793d424da4bb589c5dbe7b43416d32001519d72f005c7913bffe009f7d6",
+    "joint_samples": 1374,
+    "minimum_clearance_m": [
+      0.01025522808873218,
+      "arm_base_link/collision",
+      "upperArm_Link/collision"
+    ],
+    "max_joint_sample_step_rad": 0.012,
+    "fall_robot_contacts": []
+  },
+  "regression": {
+    "unit_tests_passed": 64,
+    "overlay_packages_built": 9,
+    "unit_test_log_sha256": "4656b71de360ddf7d4ce6b9e16a3096523bbe03560acbd93c4873451f83c2e55",
+    "build_log_sha256": "2f70a429f34ae70765343f53e05a4e1cf63399eba31d9c55ec4236d581123c0e"
+  },
+  "native_business_flag_issue": {
+    "file": "robot_ws_fixed-v1.0-master/src/xc_robot_main_control/xc_robot_main_control/xc_robot_main_control_node.py",
+    "line": 1975,
+    "commented_assignment": "self.is_picking_success=True",
+    "effect": "Successful physical harvesting is subsequently added to failed_tomato_stem because the business success flag remains False",
+    "observed_log": "validation/stage2/native_verified/run_02/native_main.log",
+    "observed_log_sha256": "534264701eef56eb1fe15d92e2c15362fb420cdfa98c68098149d85074cf65cf"
+  },
+  "acceptance_choices": {
+    "full_tcp_translation_changes_executed_sdk_flange_request": true,
+    "scalar_length_m": 0.136,
+    "cad_wrist_to_tcp_m": [
+      -0.0044,
+      -0.0049,
+      0.135952
+    ],
+    "synthetic_stalk_length_m": 0.24,
+    "synthetic_stalk_radius_m": 0.0025,
+    "payload_kind": "One fruit cluster with 12 spherical fruit collisions",
+    "mass_kg": 0.15,
+    "mass_distribution": "Uniform density by sphere volume",
+    "per_cycle_native_process": "Start a fresh native process, terminate after confirmed native gripper-open success, park the AGV, await dynamic release and settling",
+    "settling_window_s": 0.5,
+    "maximum_pairwise_position_change_m": 0.001,
+    "maximum_pairwise_rotation_change_deg": 0.5,
+    "linear_speed_limit_m_s": 0.02,
+    "angular_speed_limit_rad_s": 0.5,
+    "basket_contact_tolerance_m": 0.002
+  },
+  "remaining_validation": [
+    "Independent single-fruit asset",
+    "Dense complete v4 harvesting",
+    "Real YOLO inference in the loop",
+    "Physical hardware absolute TCP offset",
+    "Native business success flag handling"
+  ]
+}

@@ -124,6 +124,7 @@ class SdkPoseTest(unittest.TestCase):
         published = types.SimpleNamespace(publish=lambda message: None)
         arm = types.SimpleNamespace(
             kin=kin, pose_reference='sdk_flange', gripper_length=.1,
+            compensate_native_tool_offset=False, pick_waypoints=np.empty((0, 6)),
             current=lambda: OEM_HOME.copy(), execute=lambda points, **kwargs: executed.append(points),
             midpoint=published, approach=published, state_lock=threading.Condition(),
             context=types.SimpleNamespace(ok=lambda: False),
@@ -138,6 +139,36 @@ class SdkPoseTest(unittest.TestCase):
                                    [request.x, request.y - .1, request.z], atol=2e-4)
         np.testing.assert_allclose(list(target_pose.p),
                                    [request.x, request.y, request.z], atol=2e-4)
+
+    def test_opt_in_full_tool_compensation_preserves_native_cut_point(self):
+        kin = ArmKinematics()
+        for y, angle in ((.6, 0), (-.6, 0), (.6, -90), (-.6, 90)):
+            with self.subTest(y=y, angle=angle):
+                executed = []
+                published = types.SimpleNamespace(publish=lambda message: None)
+                arm = types.SimpleNamespace(
+                    kin=kin, pose_reference='sdk_flange', gripper_length=.136,
+                    compensate_native_tool_offset=True,
+                    pick_waypoints=np.array([OEM_HOME + [1.6, 0, 0, 0, 0, 0]]),
+                    current=lambda: OEM_HOME.copy(),
+                    execute=lambda points, **kwargs: executed.append(points),
+                    midpoint=published, approach=published, state_lock=threading.Condition(),
+                    context=types.SimpleNamespace(ok=lambda: False),
+                    get_logger=lambda: types.SimpleNamespace(warning=lambda text: None))
+                request = self.request(y=y, mid2target_angle=math.radians(angle))
+                response = motion.SimArm.move_to_pose(arm, request, MoveToPose.Response())
+                self.assertEqual(response.result, 0)
+                np.testing.assert_allclose(executed[0][0], arm.pick_waypoints[0])
+                midpoint, target, rotation = self.sdk_waypoints(request)
+                for joint_point, raw_point in ((executed[0][-1], midpoint),
+                                                (executed[1][-1], target)):
+                    actual = kin.fk_tcp(joint_point)
+                    expected = kdl.Vector(*raw_point) + rotation * kdl.Vector(0, 0, .136)
+                    np.testing.assert_allclose(np.array(list(actual.p)) - [0, 0, .0235],
+                                               list(expected), atol=2e-4)
+                    expected_rotation = rotation * kin.wrist_to_tcp.M
+                    self.assertLess(kdl.diff(kdl.Frame(actual.M),
+                                            kdl.Frame(expected_rotation)).rot.Norm(), 2e-4)
 
 
 if __name__ == '__main__':
