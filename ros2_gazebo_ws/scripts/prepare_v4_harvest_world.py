@@ -35,6 +35,61 @@ LEGACY_PARAMETERS = {
 }
 
 
+def contact_only(collision):
+    surface = collision.find('surface')
+    if surface is None:
+        surface = ET.SubElement(collision, 'surface')
+    contact = surface.find('contact')
+    if contact is None:
+        contact = ET.SubElement(surface, 'contact')
+    setting = contact.find('collide_without_contact')
+    if setting is None:
+        setting = ET.SubElement(contact, 'collide_without_contact')
+    setting.text = 'true'
+
+
+def set_fruit_sphere_inertia(link):
+    """Distribute the existing payload mass over its solid fruit spheres."""
+    spheres = []
+    for collision in link.findall('collision'):
+        radius = collision.findtext('geometry/sphere/radius')
+        if radius is None or collision.get('name', '').startswith('contact_stalk_'):
+            continue
+        center, _ = common.parse_xyz_rpy(collision.findtext('pose'))
+        spheres.append((center, float(radius)))
+    if not spheres:
+        raise ValueError('Payload fruit sphere collision geometry is missing')
+    inertial = link.find('inertial')
+    mass = float(inertial.findtext('mass'))
+    total_volume_factor = sum(radius**3 for _, radius in spheres)
+    sphere_masses = [mass * radius**3 / total_volume_factor for _, radius in spheres]
+    center_of_mass = [sum(sphere_mass * center[axis]
+                          for (center, _), sphere_mass in zip(spheres, sphere_masses)) / mass
+                      for axis in range(3)]
+    moments = dict.fromkeys(('ixx', 'iyy', 'izz', 'ixy', 'ixz', 'iyz'), 0.0)
+    for (center, radius), sphere_mass in zip(spheres, sphere_masses):
+        x, y, z = [center[axis] - center_of_mass[axis] for axis in range(3)]
+        sphere_inertia = 0.4 * sphere_mass * radius**2
+        moments['ixx'] += sphere_inertia + sphere_mass * (y*y + z*z)
+        moments['iyy'] += sphere_inertia + sphere_mass * (x*x + z*z)
+        moments['izz'] += sphere_inertia + sphere_mass * (x*x + y*y)
+        moments['ixy'] -= sphere_mass * x*y
+        moments['ixz'] -= sphere_mass * x*z
+        moments['iyz'] -= sphere_mass * y*z
+    pose = inertial.find('pose')
+    if pose is None:
+        pose = ET.SubElement(inertial, 'pose')
+    pose.text = ' '.join(f'{value:.16g}' for value in (*center_of_mass, 0, 0, 0))
+    inertia = inertial.find('inertia')
+    if inertia is None:
+        inertia = ET.SubElement(inertial, 'inertia')
+    for name, value in moments.items():
+        component = inertia.find(name)
+        if component is None:
+            component = ET.SubElement(inertia, name)
+        component.text = f'{value:.16g}'
+
+
 def add_stem_sensor(link, model_name, instance):
     collisions = [x.get('name') for x in link.findall('collision')
                   if '_stem' in x.get('name', '')]
@@ -137,6 +192,15 @@ def prepare(world_path=None, include_name=None, output=None):
     split = common.split_stalk(plant, fruit, plant_pose, fruit_pose, cut, tangent)
     if not split['split_visual_segment']:
         raise ValueError('The cut plane did not intersect the target stalk')
+    # The stalk still reports exact ODE contact points while the blade cuts
+    # through it. A kinematic payload must also avoid pushing the robot while
+    # SetEntityState carries it. Dynamic release restores fruit-body contact.
+    for collision in plant.findall('collision'):
+        if collision.get('name', '').startswith('contact_stalk_'):
+            contact_only(collision)
+    for collision in fruit.findall('collision'):
+        contact_only(collision)
+    set_fruit_sphere_inertia(fruit)
     stem_names = [x.get('name') for x in plant.findall('collision')
                   if '_stem' in x.get('name', '')]
     common.write_model('phase3_plant_9', [plant], movable=False, contact_collisions=stem_names,

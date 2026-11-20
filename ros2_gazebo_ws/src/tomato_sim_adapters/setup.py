@@ -18,6 +18,7 @@ setup(
         'sim_aubo_motion_service = tomato_sim_adapters.sim_aubo_motion_service:main',
         'harvest_physics_arbiter = tomato_sim_adapters.harvest_physics_arbiter:main',
         'phase4_yolo = tomato_sim_adapters.phase4_yolo:main',
+        'sim_gt_yolo_service = tomato_sim_adapters.sim_gt_yolo_service:main',
         'phase4_main_control = tomato_sim_adapters.phase4_main_control:main',
     ]},
 )

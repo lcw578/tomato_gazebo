@@ -1,0 +1,70 @@
+{
+  "stage1_base": {
+    "branch": "codex/harvest-closure-stage2",
+    "commit": "933efbd014ddbb30825f71574570f20eb4fb50c7",
+    "tag": "geometry-actuators-2026-11-20"
+  },
+  "candidate_station": {
+    "slide_initial_m": 1.25,
+    "lift_height_argument_m": 0.5,
+    "world_arm_base_xyz_m": [
+      1.252,
+      -0.004,
+      1.270379
+    ],
+    "world_cut_point_m": [
+      1.19990725232334,
+      -0.7130195195580309,
+      2.0754807577731516
+    ],
+    "cut_point_arm_base_xyz_m": [
+      0.052092747676660035,
+      0.709019519558031,
+      0.8051017577731516
+    ],
+    "distance_m": 1.074062928251517,
+    "tcp_ik_reachable": true,
+    "service_midpoint_ik_reachable": true,
+    "zero_lift_target_arm_base_xyz_m": [
+      0.052092747676660035,
+      0.709019519558031,
+      1.3051017577731514
+    ],
+    "zero_lift_distance_m": 1.4861739237442482,
+    "zero_lift_ik_reachable": false,
+    "negative_half_m_lift_distance_m": 1.9400553315280793,
+    "negative_half_m_lift_ik_reachable": false,
+    "frame_reason": "chassis_cad_datum is rolled pi around X. lift_mount xyz z=-lift_height maps to world +Z. arm_mount xyz z=-0.704 also maps to world +Z."
+  },
+  "independent_physical_world_pose_run": {
+    "scene": "geometry_diagnostic",
+    "arm_trajectories": 3,
+    "wall_duration_s": 1.8007171349963755,
+    "simulation_duration_s": 1.7999999999999545,
+    "sim_time_factor": 0.9996017503346396,
+    "sample_count": 8430,
+    "gazebo_get_entity_state_robot_carriage_world_x_peak_mm": 3.960065608765717e-08,
+    "joint_states_machine_slide_peak_mm": 9.539757872545351e-09,
+    "first_clock_s": 836.6,
+    "last_clock_s": 838.4,
+    "clock_qos": "BEST_EFFORT",
+    "clock_ready_before_start": true
+  },
+  "prior_unbraked_run_world_pose_cross_check": {
+    "gazebo_reported_physical_wrist_tcp_world_m": [
+      0.4820142340299658,
+      -0.38790229684899485,
+      1.2365777727634597
+    ],
+    "reconstructed_exposure_time_tcp_goal_world_m": [
+      0.4918504090419561,
+      -0.3879016377334138,
+      1.2365516453703789
+    ],
+    "physical_tcp_to_goal_mm": 9.836209734527062,
+    "rail_axis_error_mm": -9.8361750119903,
+    "joint_states_sampled_peak_drift_mm": 10.379223077856714,
+    "source": "/data/tomato_gazebo/ros2_gazebo_ws/validation/parking_cameras/before_sphere_right/measurements.json",
+    "limitation": "The historical run saved the physical wrist TCP endpoint but not a physical robot_carriage pose series, so the independent endpoint confirms the drift magnitude while not independently reconstructing the exact 10.379 mm peak."
+  }
+}

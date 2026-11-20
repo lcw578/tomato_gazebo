@@ -1,0 +1,538 @@
+{
+  "stage2a": {
+    "passed_cycles": 2,
+    "attempted_final_cycles": 2,
+    "configuration": {
+      "rail_station_m": 1.25,
+      "lift_height_m": 0.85,
+      "truth_tool_roll_deg": 90,
+      "motion_config": "src/tomato_sim_gazebo/config/stage2_truth_motion.yaml"
+    },
+    "cycles": [
+      {
+        "mode": "ground_truth_service_drive",
+        "target_model": "fruit_truss_9_1",
+        "rail_station_m": 1.2499915491109694,
+        "tcp_cutpoint_error_m": 3.4028280603091056e-05,
+        "input_x1_at_cut": 1,
+        "test_result_2": true,
+        "finger_closed_residual_m": {
+          "left": 3.6992401915153517e-06,
+          "right": 3.875870173817089e-06
+        },
+        "blade_contact": {
+          "collision": "plant_0_8_1::plant::contact_stalk_plant_035_cap_-1",
+          "contact_tool_m": [
+            -0.005056429634650583,
+            -0.004196272215062136,
+            -0.08496638653746125
+          ],
+          "tcp_cutpoint_error_m": 0.0005018417487738841,
+          "crossing_angle_deg": 0.000950989640937822
+        },
+        "blade_sample": {
+          "contact_tool_m": [
+            -0.005056429634650583,
+            -0.004196272215062136,
+            -0.08496638653746125
+          ],
+          "tcp_cutpoint_error_m": 0.0005018417487738841,
+          "crossing_angle_deg": 0.000950989640937822,
+          "blade_plane_error_m": 0.00015910356901794112
+        },
+        "cut_success": true,
+        "main_stem_contacts": 0,
+        "held_follow_error_m": 0.0005002590030356526,
+        "tcp_grasp_world_m": [
+          1.1999386678606863,
+          -0.7130183697975059,
+          2.075467732185073
+        ],
+        "tcp_retracted_world_m": [
+          1.1999381307542056,
+          -0.6130182885894859,
+          2.0754682062316796
+        ],
+        "fruit_grasp_world_m": [
+          1.19990725233,
+          -0.687164502124,
+          2.06418037841
+        ],
+        "held_displacement_m": 0.09949998910105007,
+        "release_position_world_m": [
+          0.8658477114858717,
+          -0.01647722044480686,
+          1.1219601893892996
+        ],
+        "settled_root_basket_m": [
+          0.15236754011416576,
+          0.026631717174456802,
+          0.11736391561832549
+        ],
+        "settled_rotation_basket_xyzw": [
+          0.5306947906843325,
+          -0.4550967298281849,
+          0.5821070173523042,
+          -0.41521250702430534
+        ],
+        "basket_containment": {
+          "inside": true,
+          "sphere_count": 12,
+          "tolerance_m": 0.002,
+          "body_bounds_min_m": [
+            -0.13033697951844334,
+            -0.016121024456210623,
+            0.07169105317455032
+          ],
+          "body_bounds_max_m": [
+            0.1404435561306233,
+            0.08469610924535186,
+            0.15433459893104964
+          ],
+          "interior_bounds_min_m": [
+            -0.15,
+            -0.205,
+            0.025379
+          ],
+          "interior_bounds_max_m": [
+            0.15,
+            0.205,
+            0.154379
+          ],
+          "outside_by_axis_m": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "settling": {
+          "linear_speed_m_s": 0.005440307090430969,
+          "stable_sim_duration_s": 0.5,
+          "sample_sim_time_s": 2209.7
+        },
+        "release": {
+          "model_name": "fruit_truss_9_1_released",
+          "dynamics_enabled": true,
+          "sim_time_s": 2208.2,
+          "initial_position_world_m": [
+            0.8658477114856811,
+            -0.016477220444805697,
+            1.1219601893902305
+          ],
+          "initial_rotation_world_xyzw": [
+            -0.35355922061689893,
+            -0.6123743411448506,
+            -0.35353540636660846,
+            -0.612377547163005
+          ]
+        },
+        "passed": true,
+        "held_follow_endpoint_sample_count": 271,
+        "held_follow_endpoint_first_sample": {
+          "sim_time_s": 2189.9,
+          "position_world_m": [
+            1.2005833560272325,
+            -0.6869606510327164,
+            2.0640457214782937
+          ],
+          "error_m": 0.09979863596079185
+        },
+        "held_follow_endpoint_last_sample": {
+          "sim_time_s": 2190.2,
+          "position_world_m": [
+            1.1999144705878113,
+            -0.5876645136735815,
+            2.0641715822506472
+          ],
+          "error_m": 0.0005002590030356526
+        },
+        "held_follow_endpoint_convergence_s": 0.29999999999972715,
+        "raw_evidence": "validation/stage2/truth_harvest_cycle1.json"
+      },
+      {
+        "mode": "ground_truth_service_drive",
+        "target_model": "fruit_truss_9_1",
+        "rail_station_m": 1.2499915476335537,
+        "tcp_cutpoint_error_m": 3.4032885978390434e-05,
+        "input_x1_at_cut": 1,
+        "test_result_2": true,
+        "finger_closed_residual_m": {
+          "left": 3.6995913998364577e-06,
+          "right": 3.876227399850565e-06
+        },
+        "blade_contact": {
+          "collision": "plant_0_8_1::plant::contact_stalk_plant_035_cap_-1",
+          "contact_tool_m": [
+            -0.004882100566800718,
+            -0.004172269791200778,
+            -0.0849631039012988
+          ],
+          "tcp_cutpoint_error_m": 3.4034511113579974e-05,
+          "crossing_angle_deg": 0.0009610150647259424
+        },
+        "blade_sample": {
+          "contact_tool_m": [
+            -0.004882100566800718,
+            -0.004172269791200778,
+            -0.0849631039012988
+          ],
+          "tcp_cutpoint_error_m": 3.4034511113579974e-05,
+          "crossing_angle_deg": 0.0009610150647259424,
+          "blade_plane_error_m": 1.5225498831924339e-05
+        },
+        "cut_success": true,
+        "main_stem_contacts": 0,
+        "held_follow_error_m": 3.826412033613264e-09,
+        "held_follow_endpoint_convergence_s": 0.0,
+        "tcp_grasp_world_m": [
+          1.1999386725802432,
+          -0.7130183683362554,
+          2.075467731665806
+        ],
+        "tcp_retracted_world_m": [
+          1.1999381355366812,
+          -0.6130182869976009,
+          2.0754682057146656
+        ],
+        "fruit_grasp_world_m": [
+          1.19990725233,
+          -0.687164502124,
+          2.06418037841
+        ],
+        "held_displacement_m": 0.10000010208476184,
+        "release_position_world_m": [
+          0.865857039366043,
+          -0.01623376516247798,
+          1.122397109124887
+        ],
+        "settled_root_basket_m": [
+          0.15026540334755956,
+          0.005918800889908216,
+          0.11736510095601738
+        ],
+        "settled_rotation_basket_xyzw": [
+          0.46450678715802257,
+          -0.5224738963899791,
+          0.6327650647088044,
+          -0.3329607261514001
+        ],
+        "basket_containment": {
+          "inside": true,
+          "sphere_count": 12,
+          "tolerance_m": 0.002,
+          "body_bounds_min_m": [
+            -0.12115756871312021,
+            -0.025329229034252602,
+            0.07168995889744932
+          ],
+          "body_bounds_max_m": [
+            0.14272792994123912,
+            0.13277450989251358,
+            0.1543354697877313
+          ],
+          "interior_bounds_min_m": [
+            -0.15,
+            -0.205,
+            0.025379
+          ],
+          "interior_bounds_max_m": [
+            0.15,
+            0.205,
+            0.154379
+          ],
+          "outside_by_axis_m": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "settling": {
+          "linear_speed_m_s": 0.005531263660542103,
+          "stable_sim_duration_s": 0.5,
+          "sample_sim_time_s": 2329.5
+        },
+        "release": {
+          "model_name": "fruit_truss_9_1_released",
+          "dynamics_enabled": true,
+          "sim_time_s": 2327.5,
+          "initial_position_world_m": [
+            0.865857039366043,
+            -0.01623376516247798,
+            1.122397109124887
+          ],
+          "initial_rotation_world_xyzw": [
+            -0.3535592340514911,
+            -0.6123739488547507,
+            -0.3535352013632859,
+            -0.612378050045871
+          ]
+        },
+        "passed": true,
+        "held_follow_endpoint_sample_count": 1,
+        "held_follow_endpoint_first_sample": {
+          "sim_time_s": 2309.5,
+          "position_world_m": [
+            1.1999068448178563,
+            -0.5871644000414139,
+            2.064180897131616
+          ],
+          "error_m": 3.826412033613264e-09
+        },
+        "held_follow_endpoint_last_sample": {
+          "sim_time_s": 2309.5,
+          "position_world_m": [
+            1.1999068448178563,
+            -0.5871644000414139,
+            2.064180897131616
+          ],
+          "error_m": 3.826412033613264e-09
+        },
+        "raw_evidence": "validation/stage2/truth_harvest_cycle2.json"
+      }
+    ],
+    "geometry_clearance": {
+      "scope": {
+        "lift": 0.85,
+        "station": 1.25,
+        "harvest_roll_deg": 90,
+        "initial_q": [
+          1.3188300271593363,
+          -0.669031815285035,
+          1.194835852196591,
+          1.4652968982168249,
+          -2.8780482209686156,
+          -1.87563702030091
+        ],
+        "initial_payload_orientation": "identity world before grasp",
+        "adjacent_fixed_groups_excluded": true,
+        "payload_gripper_contacts_excluded": true,
+        "max_joint_sample_step_rad": 0.012,
+        "internal_closed_finger_pair_excluded": [
+          "left_finger_link",
+          "right_finger_link"
+        ],
+        "first_20mm_retreat_cut_stalk_contacts_recorded_separately": true,
+        "retreat_cut_stalk_last_contact_m": 0.011
+      },
+      "minimum_self": [
+        0.009121832774731947,
+        "foreArm_Link/collision",
+        "cutter_base_link/cutter_housing"
+      ],
+      "minimum_stem": [
+        0.010216652122069967,
+        "foreArm_Link/collision",
+        "plant_0_8_1/plant/g_v9_stem_collision"
+      ],
+      "minimum_other": [
+        0.00304029555100059,
+        "right_finger_link/right_blade",
+        "plant_0_8_1/plant/contact_stalk_plant_039_cap_-1"
+      ],
+      "empty_exit_summary": {
+        "minimum_self": [
+          0.010255236103579063,
+          "arm_base_link/collision",
+          "upperArm_Link/collision"
+        ],
+        "minimum_stem": [
+          0.11969690908696923,
+          "right_finger_link/right_blade",
+          "plant_0_8_1/plant/g_v9_stem_collision"
+        ],
+        "minimum_other": [
+          0.09869195795307881,
+          "right_finger_link/right_blade",
+          "plant_0_8_0/truss_4_0/g_tr16_s2"
+        ]
+      }
+    }
+  },
+  "stage2b": {
+    "status": "blocked_on_tool_pose_and_inverse_kinematics",
+    "vision_subchain": {
+      "evaluation_scope": "vision_subchain",
+      "execution": "GT_service_calls_and_isolated_original_vision_functions",
+      "frame_count": 3,
+      "exposure_stamps_ns": [
+        957806000000,
+        959807000000,
+        961606000000
+      ],
+      "frame_evidence": [
+        "/data/tomato_gazebo/ros2_gazebo_ws/validation/stage2/vision/default_main_1000_frame1/vision_diagnostic.json",
+        "/data/tomato_gazebo/ros2_gazebo_ws/validation/stage2/vision/default_main_1000_frame2/vision_diagnostic.json",
+        "/data/tomato_gazebo/ros2_gazebo_ws/validation/stage2/vision/default_main_1000_frame3/vision_diagnostic.json"
+      ],
+      "gt_service_evidence": "/data/tomato_gazebo/ros2_gazebo_ws/validation/stage2/vision/gt_service_1000.json",
+      "depth_units_per_metre": 1000,
+      "original_main_gripper_length_m": 0.1,
+      "all_geometry_and_stem_checks_passed": true,
+      "all_original_main_depths_usable": true,
+      "all_original_main_distance_gates_passed": true,
+      "original_skeleton_points": {
+        "minimum": 22,
+        "maximum": 22,
+        "mean": 22.0
+      },
+      "main_pick_total_error_mm": {
+        "minimum": 3.9184039533418837,
+        "maximum": 3.918404011205998,
+        "mean": 3.9184039829928907
+      },
+      "main_pick_signed_axial_error_mm": {
+        "minimum": 1.8059937736792786,
+        "maximum": 1.8059937736792786,
+        "mean": 1.8059937736792786
+      },
+      "main_pick_normal_error_mm": {
+        "minimum": 3.4773950064663324,
+        "maximum": 3.477395071668868,
+        "mean": 3.4773950398777287
+      },
+      "original_main_base_angle_deg": {
+        "minimum": -3.246084532961045,
+        "maximum": -3.246084532961045,
+        "mean": -3.2460845329610444
+      },
+      "original_main_request": {
+        "xyz_m": [
+          0.04860708165105754,
+          0.6072221649501361,
+          0.45528140574764536
+        ],
+        "rpy_rad": [
+          1.5707963267948966,
+          1.2217304763960306,
+          3.141592653589793
+        ],
+        "rpy_deg": [
+          90.0,
+          70.0,
+          180.0
+        ],
+        "mid2target_angle_rad": 0.0,
+        "gripper_length_m": 0.1,
+        "start2mid": false,
+        "mid_to_target": false,
+        "sim_midpoint_base_m": [
+          0.04860708165105754,
+          0.6072221649501361,
+          0.45528140574764536
+        ],
+        "sim_target_base_m": [
+          0.04860708165105754,
+          0.7072221649501361,
+          0.45528140574764536
+        ],
+        "sim_tcp_interpretation_crossing_angle_deg": 85.64493656907082,
+        "sdk_flange_interpretation_crossing_angle_deg": 88.41621073507771
+      },
+      "original_main_after_stop_depth_m": {
+        "minimum": 0.771,
+        "maximum": 0.771,
+        "mean": 0.771
+      },
+      "original_main_first_seen_mask_average_depth_m": {
+        "minimum": 0.7756350364963503,
+        "maximum": 0.7756350364963503,
+        "mean": 0.7756350364963503
+      },
+      "source_sha256": {
+        "/data/tomato_gazebo/robot_ws_fixed-v1.0-master/src/xc_robot_main_control/xc_robot_main_control/xc_robot_main_control_node.py": "ddedeeccce38916ab5af97a65a684524fc8f4738fd99ba13f8d56547d067b60f",
+        "/data/tomato_gazebo/robot_ws_fixed-v1.0-master/src/xc_robot_main_control/xc_robot_main_control/stemGrowthAndPoints.py": "ebc0b140afcbe7430c70b90bccec452059e65b4f48e44340f1ffd217a6a9e6db"
+      },
+      "crossing_angle_acceptance_limit_deg": 30.0,
+      "predicted_crossing_angle_within_acceptance": false
+    },
+    "native_request_precheck": {
+      "request": {
+        "x": 0.048607081651,
+        "y": 0.60722216495,
+        "z": 0.455281405748,
+        "rx": 1.5707963267948966,
+        "ry": 1.2217304763960306,
+        "rz": 3.141592653589793,
+        "mid2target_angle": 0.0,
+        "request_gripper_length": 0.1
+      },
+      "midpoint_base": [
+        0.048607081651,
+        0.60722216495,
+        0.455281405748
+      ],
+      "target_base": [
+        0.048607081651,
+        0.70722216495,
+        0.455281405748
+      ],
+      "start_q": [
+        0.18011797880581482,
+        0.2682571060315284,
+        2.339613862298399,
+        2.0429078894593626,
+        1.5119787310026875,
+        0.0
+      ],
+      "lift": 0.85,
+      "station": 1.25,
+      "target_world": [
+        1.203392918349,
+        -0.7112221649499998,
+        2.0756604057479997
+      ],
+      "target_error_m": 0.0039258915706266604,
+      "blade_normal_world": [
+        0.3420201433256689,
+        5.045335715026657e-34,
+        -0.9396926207859084
+      ],
+      "blade_peduncle_axis_angle_deg": 85.64493656907084,
+      "planning_error": "No AUBO IK solution for [0.04279653541724624, 0.7431741649500001, 0.45218180053678203]",
+      "failed_stage": "midpoint_ik",
+      "unexecuted_partial_approach": [],
+      "midpoint_multiseed_ik_solutions": [],
+      "target_multiseed_ik_solutions": []
+    },
+    "native_process": {
+      "mode": "unchanged_real_main_process",
+      "stop_reason": "native_request_inverse_kinematics_failed",
+      "completed_harvest_cycles": 0,
+      "observed_service_result": 30003,
+      "request_position_base_m": [
+        0.048607,
+        0.607222,
+        0.455281
+      ],
+      "request_rpy_deg": [
+        90,
+        70,
+        180
+      ],
+      "main_log": "validation/stage2/vision/native_main.log",
+      "motion_log": "validation/stage2/motion_service_native.log",
+      "shutdown": "SIGINT and SIGTERM left an active Python thread, so the test-owned process required SIGKILL"
+    },
+    "successful_full_cycles": 0
+  },
+  "verification": {
+    "unit_tests_passed": 44,
+    "build_packages": 9,
+    "world_original_includes_preserved": 94,
+    "world_plant_instances_preserved": 60
+  },
+  "payload_mass_assumption": {
+    "total_mass_kg": 0.15,
+    "density_model": "uniform solid collision spheres",
+    "center_of_mass_link_m": [
+      0.008682392304090833,
+      -0.004107233774080917,
+      -0.1533856675410333
+    ]
+  },
+  "limitations": [
+    "The first passing truth cycle had a 99.799 mm initial endpoint discrepancy and converged within 0.3 simulated seconds. Continuous in-motion tracking error was not recorded.",
+    "The GT vision geometry represents the initial target state after a local reset.",
+    "A real wrist-to-cutter installation reference and SDK TCP configuration are still required to establish the original business-pose mapping."
+  ]
+}

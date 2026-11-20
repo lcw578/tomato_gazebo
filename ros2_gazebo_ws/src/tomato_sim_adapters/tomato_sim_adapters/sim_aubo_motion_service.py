@@ -23,6 +23,18 @@ from xc_interfaces.srv import MoveJoints, MoveToPose
 
 from .arm_kinematics import ArmKinematics, BOUND, JOINTS, OEM_HOME
 
+
+def parse_box_waypoints(values):
+    if values is None:
+        return np.empty((0, 6))
+    points = np.asarray(values, dtype=float)
+    if points.ndim != 1 or points.size % 6:
+        raise ValueError('box_waypoints_rad must contain six joint angles per waypoint')
+    if not np.isfinite(points).all() or np.any(np.abs(points) > BOUND):
+        raise ValueError('box_waypoints_rad must contain finite joint angles within AUBO limits')
+    return points.reshape((-1, 6))
+
+
 def waypoints(request, gripper_length=0.0):
     xyz = np.array([request.x, request.y, request.z])
     angles = np.array([request.rx, request.ry, request.rz, request.mid2target_angle])
@@ -55,6 +67,9 @@ class SimArm(Node):
             raise ValueError('action_timeout_scale must be at least 1.0')
         box = self.declare_parameter('box_joints_rad', rclpy.Parameter.Type.DOUBLE_ARRAY).value
         self.box = np.asarray(box) if box is not None else None
+        route = self.declare_parameter(
+            'box_waypoints_rad', rclpy.Parameter.Type.DOUBLE_ARRAY).value
+        self.box_waypoints = parse_box_waypoints(route)
         self.tf = Buffer()
         self.tf_listener = TransformListener(self.tf, self)
         self.gripper_length = self.declare_parameter('request_gripper_length', 0.0).value
@@ -268,15 +283,18 @@ class SimArm(Node):
         try:
             if self.approach_q:
                 self.retreat()
-            target = self.box
-            if target is None:
-                transform = self.tf.lookup_transform(
-                    'arm_base_link', 'basket_link', rclpy.time.Time()).transform
-                p, q = transform.translation, transform.rotation
-                base_from_basket = kdl.Frame(
-                    kdl.Rotation.Quaternion(q.x, q.y, q.z, q.w), kdl.Vector(p.x, p.y, p.z))
-                target = self.kin.ik_basket(base_from_basket, OEM_HOME)
-            self.execute([OEM_HOME, target])
+            points = self.box_waypoints
+            if not len(points):
+                target = self.box
+                if target is None:
+                    transform = self.tf.lookup_transform(
+                        'arm_base_link', 'basket_link', rclpy.time.Time()).transform
+                    p, q = transform.translation, transform.rotation
+                    base_from_basket = kdl.Frame(
+                        kdl.Rotation.Quaternion(q.x, q.y, q.z, q.w), kdl.Vector(p.x, p.y, p.z))
+                    target = self.kin.ik_basket(base_from_basket, OEM_HOME)
+                points = [OEM_HOME, target]
+            self.execute(points)
             self.midpoint_q = None
         except (ValueError, RuntimeError, TransformException) as error:
             self.get_logger().warning(str(error))

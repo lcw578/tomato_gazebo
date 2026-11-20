@@ -169,7 +169,7 @@
       <plugin name="mujoco_contact_blade_ros" filename="libgazebo_ros_bumper.so">
         <ros><namespace>/sim/harvest</namespace>
              <remapping>bumper_states:=blade_contacts</remapping></ros>
-        <frame_name>cutter_base_link</frame_name>
+        <frame_name>world</frame_name>
       </plugin>
     </sensor>
   </gazebo>

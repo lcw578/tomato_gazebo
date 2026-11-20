@@ -16,6 +16,8 @@ from std_msgs.msg import Bool, UInt8
 from tf2_ros import Buffer, TransformException, TransformListener
 from xc_interfaces.msg import MidpointReached, TestResult
 
+from .gt_geometry_projection import pose_matrix, transform_matrix
+
 CUT_SLOT_Y = (-0.0075, 0.0025)
 CUT_SLOT_Z = (-0.094, -0.052)
 CLOSED_BLADE_X = -0.004897326065632642
@@ -60,6 +62,46 @@ def pose_msg(value):
     return msg
 
 
+def fruit_body_containment(sdf_file, model_in_basket, tolerance_m=0.002):
+    """Check every fruit-body collision sphere against the basket interior."""
+    if not math.isfinite(tolerance_m) or tolerance_m < 0:
+        raise ValueError('Basket containment tolerance must be finite and nonnegative')
+    # Inner faces of basket_cad walls and floor. Basket +Z points down.
+    interior_min = (-0.15, -0.205, 0.025379)
+    interior_max = (0.15, 0.205, 0.154379)
+    body_min = [math.inf] * 3
+    body_max = [-math.inf] * 3
+    sphere_count = 0
+    basket_from_model = transform_matrix(*model_in_basket)
+    model = ET.parse(sdf_file).getroot().find('model')
+    for link in model.findall('link'):
+        basket_from_link = basket_from_model @ pose_matrix(link.findtext('pose'))
+        for collision in link.findall('collision'):
+            sphere = collision.find('geometry/sphere')
+            if sphere is None or collision.get('name', '').startswith('contact_stalk_'):
+                continue
+            radius = float(sphere.findtext('radius'))
+            center = (basket_from_link @ pose_matrix(collision.findtext('pose')))[:3, 3]
+            if radius <= 0 or not all(math.isfinite(value) for value in (*center, radius)):
+                raise ValueError('Fruit collision sphere must have finite geometry and positive radius')
+            sphere_count += 1
+            for axis in range(3):
+                body_min[axis] = min(body_min[axis], float(center[axis]) - radius)
+                body_max[axis] = max(body_max[axis], float(center[axis]) + radius)
+    if not sphere_count:
+        raise ValueError('Target SDF has no fruit-body collision spheres')
+    outside = [max(0., interior_min[axis] - body_min[axis], body_max[axis] - interior_max[axis])
+               for axis in range(3)]
+    return {
+        'inside': all(value <= tolerance_m for value in outside),
+        'sphere_count': sphere_count, 'tolerance_m': tolerance_m,
+        'body_bounds_min_m': body_min, 'body_bounds_max_m': body_max,
+        'interior_bounds_min_m': list(interior_min),
+        'interior_bounds_max_m': list(interior_max),
+        'outside_by_axis_m': outside,
+    }
+
+
 class HarvestPhysicsArbiter(Node):
     def __init__(self):
         super().__init__('harvest_physics_arbiter')
@@ -70,6 +112,9 @@ class HarvestPhysicsArbiter(Node):
         scene_path = Path(self.get_parameter('scene_file').value)
         self.scene = json.loads(scene_path.read_text())
         self.model = self.get_parameter('plant_model').value or self.scene['target_model']
+        # Gazebo Classic resolves a same-name respawn against the original
+        # world's pose graph, overriding SpawnEntity.initial_pose.
+        self.release_model = self.model + '_released'
         self.release_sdf = scene_path.parent / self.scene.get(
             'release_sdf', 'models/phase3_fruit_truss_9_1/model.sdf')
         self.basket_frame = self.get_parameter('basket_frame').value
@@ -89,9 +134,12 @@ class HarvestPhysicsArbiter(Node):
         self.main_stem_contact_active = False
         self.stem_contacts_by_topic = {}
         self.blade_peduncle_contact = False
-        self.payload_contacts_active = set()
+        self.reported_payload_contacts = set()
         self.held = False
         self.pending_model_request = False
+        self.release_requested = False
+        self.drop_pose = None
+        self.pending_close_until_ns = None
         self.tcp_at_grasp = None
         self.fruit_at_grasp = None
         self.latest_tcp = None
@@ -125,8 +173,11 @@ class HarvestPhysicsArbiter(Node):
         self.flush()
 
     def flush(self):
+        self.evidence['hold_error'] = self.hold_error
         self.evidence_path.parent.mkdir(parents=True, exist_ok=True)
-        self.evidence_path.write_text(json.dumps(self.evidence, indent=2) + '\n')
+        temporary = self.evidence_path.with_suffix(self.evidence_path.suffix + '.tmp')
+        temporary.write_text(json.dumps(self.evidence, indent=2) + '\n')
+        temporary.replace(self.evidence_path)
 
     def note_image(self, key, message):
         self.evidence['camera'][key] = {
@@ -145,6 +196,7 @@ class HarvestPhysicsArbiter(Node):
             self.input_x1 = False
             self.feedback_sent = False
             self.blade_peduncle_contact = False
+            self.pending_close_until_ns = None
             self.last_feedback = 0
             self.sensor_pub.publish(Bool(data=False))
             self.x1_pub.publish(UInt8(data=0))
@@ -153,10 +205,18 @@ class HarvestPhysicsArbiter(Node):
     def transform_point(transform, point):
         q = transform.transform.rotation
         translation = transform.transform.translation
-        inverse = (-q.x, -q.y, -q.z, q.w)
-        return qrotate(inverse, (point[0] - translation.x,
-                                 point[1] - translation.y,
-                                 point[2] - translation.z))
+        rotated = qrotate((q.x, q.y, q.z, q.w), point)
+        return (rotated[0] + translation.x, rotated[1] + translation.y,
+                rotated[2] + translation.z)
+
+    @staticmethod
+    def transform_direction(transform, direction):
+        q = transform.transform.rotation
+        rotated = qrotate((q.x, q.y, q.z, q.w), direction)
+        norm = math.sqrt(sum(value * value for value in rotated))
+        if norm < 1e-9:
+            return (0.0, 0.0, 0.0)
+        return tuple(value / norm for value in rotated)
 
     def valid_blade_contact(self, state):
         names = (state.collision1_name, state.collision2_name)
@@ -173,7 +233,7 @@ class HarvestPhysicsArbiter(Node):
             base_tf = self.buffer.lookup_transform('cutter_base_link', 'world', rclpy.time.Time())
         except TransformException:
             return None
-        tangent = self.transform_point(base_tf, self.scene['peduncle_tangent_world'])
+        tangent = self.transform_direction(base_tf, self.scene['peduncle_tangent_world'])
         tangent_norm = math.sqrt(sum(component * component for component in tangent))
         if tangent_norm < 1e-9:
             return None
@@ -182,6 +242,11 @@ class HarvestPhysicsArbiter(Node):
             return None
         for position in state.contact_positions:
             local = self.transform_point(base_tf, (position.x, position.y, position.z))
+            self.evidence['latest_blade_sample'] = {
+                'contact_tool_m': local, 'tcp_cutpoint_error_m': tcp_error,
+                'crossing_angle_deg': crossing_angle,
+                'blade_plane_error_m': abs(local[0] - CLOSED_BLADE_X),
+            }
             in_slot = (CUT_SLOT_Y[0] < local[1] < CUT_SLOT_Y[1]
                        and CUT_SLOT_Z[0] < local[2] < CUT_SLOT_Z[1])
             on_blade_plane = abs(local[0] - CLOSED_BLADE_X) <= 0.0005
@@ -213,32 +278,45 @@ class HarvestPhysicsArbiter(Node):
                 self.evidence['latest_cut_contact'] = accepted
 
     def on_payload_contacts(self, message):
-        active = set()
         state_name = self.evidence['state']
         if state_name not in ('HELD_BY_GRIPPER', 'RELEASED', 'IN_BASKET', 'DROPPED'):
-            self.payload_contacts_active.clear()
             return
         for state in message.states:
             pair = (state.collision1_name, state.collision2_name)
-            if not any('fruit_truss_9_1' in name for name in pair):
+            if not any(name.split('::', 1)[0] in (self.model, self.release_model) for name in pair):
                 continue
-            key = tuple(sorted(pair))
-            active.add(key)
-            if key in self.payload_contacts_active:
+            key = (state_name, *sorted(pair))
+            if key in self.reported_payload_contacts:
                 continue
-            basket_contact = any('basket_link' in name for name in pair)
+            self.reported_payload_contacts.add(key)
+            basket_contact = any('basket_link' in name or 'crate_col_' in name for name in pair)
             self.evidence.setdefault('transport_contacts', []).append({
                 'pair': list(pair), 'phase': state_name,
                 'classification': 'basket_contact' if basket_contact else 'transport_contact',
                 'sim_time_s': self.get_clock().now().nanoseconds / 1e9,
             })
             self.flush()
-        self.payload_contacts_active = active
 
     def on_gripper(self, message):
         if not message.data:
+            self.pending_close_until_ns = None
+            self.release_requested = True
             self.release_payload()
             return
+        self.release_requested = False
+        if self.held or self.pending_model_request:
+            return
+        # Gripper completion and the contact sensor use independent ROS
+        # callbacks. Retain the close event until the next sensor samples.
+        if (self.input_x1 and not self.main_stem_contact_active
+                and not self.blade_peduncle_contact):
+            if self.pending_close_until_ns is None:
+                self.pending_close_until_ns = self.get_clock().now().nanoseconds + 500_000_000
+            return
+        self.finish_cut_attempt()
+
+    def finish_cut_attempt(self):
+        self.pending_close_until_ns = None
         if not self.input_x1 or self.main_stem_contact_active or not self.blade_peduncle_contact:
             self.evidence['cut_attempts'].append({
                 'event': 'CUT_MISS', 'reason': 'no_contact_in_closed_throat',
@@ -259,10 +337,12 @@ class HarvestPhysicsArbiter(Node):
             })
             self.flush()
             return
+        self.pending_model_request = True
         self.call_model_state(self.get_state, self.capture_grasp)
 
     def call_model_state(self, client, callback):
         if not client.wait_for_service(timeout_sec=0.2):
+            self.pending_model_request = False
             self.hold_error = f'{client.srv_name} unavailable'
             return
         request = GetEntityState.Request()
@@ -272,10 +352,11 @@ class HarvestPhysicsArbiter(Node):
         future.add_done_callback(callback)
 
     def capture_grasp(self, future):
+        self.pending_model_request = False
         try:
             response = future.result()
             if not response.success:
-                raise RuntimeError(response.status_message)
+                raise RuntimeError('GetEntityState failed for grasp')
             self.fruit_at_grasp = pose_from_msg(response.state.pose)
             self.tcp_at_grasp = self.latest_tcp
             self.held = True
@@ -290,6 +371,10 @@ class HarvestPhysicsArbiter(Node):
             self.flush()
 
     def tick(self):
+        if self.drop_pose is not None:
+            if not self.pending_model_request:
+                self.spawn_dropped()
+            return
         try:
             transform = self.buffer.lookup_transform('world', 'tool_tcp', rclpy.time.Time())
         except TransformException:
@@ -297,6 +382,10 @@ class HarvestPhysicsArbiter(Node):
         msg = transform.transform
         self.latest_tcp = ((msg.translation.x, msg.translation.y, msg.translation.z),
                            (msg.rotation.x, msg.rotation.y, msg.rotation.z, msg.rotation.w))
+        if (self.pending_close_until_ns is not None
+                and (self.blade_peduncle_contact
+                     or self.get_clock().now().nanoseconds >= self.pending_close_until_ns)):
+            self.finish_cut_attempt()
         if self.approaching and self.midpoint_reached:
             distance = math.dist(self.latest_tcp[0], self.cut_point)
             stem_contact = self.main_stem_contact_active
@@ -320,7 +409,10 @@ class HarvestPhysicsArbiter(Node):
                 })
                 self.flush()
         if self.held and not self.pending_model_request:
-            self.follow_grasp()
+            if self.release_requested:
+                self.release_payload()
+            else:
+                self.follow_grasp()
 
     def follow_grasp(self):
         if not self.set_state.service_is_ready() or self.latest_tcp is None:
@@ -352,6 +444,9 @@ class HarvestPhysicsArbiter(Node):
     def release_payload(self):
         if not self.held or self.pending_model_request or self.latest_tcp is None:
             return
+        if self.drop_pose is not None:
+            self.spawn_dropped()
+            return
         if (not self.get_state.service_is_ready() or not self.delete_model.service_is_ready()
                 or not self.spawn_model.service_is_ready()):
             self.hold_error = 'Gazebo spawn/delete services unavailable for dynamic release'
@@ -369,33 +464,58 @@ class HarvestPhysicsArbiter(Node):
                 raise RuntimeError(getattr(response, 'status_message', 'GetEntityState failed'))
             drop_pose = pose_from_msg(response.state.pose)
             delete = self.delete_model.call_async(DeleteEntity.Request(name=self.model))
-            delete.add_done_callback(lambda result: self.spawn_dropped(result, drop_pose))
+            delete.add_done_callback(lambda result: self.release_deleted(result, drop_pose))
         except Exception as error:
             self.pending_model_request = False
             self.hold_error = f'fruit release pose failed: {error}'
 
-    def spawn_dropped(self, future, drop_pose):
+    def release_deleted(self, future, drop_pose):
         try:
             deleted = future.result()
             if not deleted.success:
                 raise RuntimeError(getattr(deleted, 'status_message', 'DeleteEntity failed'))
+            self.drop_pose = drop_pose
+        except Exception as error:
+            self.pending_model_request = False
+            self.hold_error = f'fruit delete failed: {error}'
+            self.flush()
+            return
+        self.spawn_dropped()
+
+    def spawn_dropped(self):
+        if not self.spawn_model.service_is_ready():
+            self.pending_model_request = False
+            self.hold_error = 'Gazebo spawn service unavailable for dynamic release'
+            self.flush()
+            return
+        try:
             root = ET.parse(self.release_sdf).getroot()
-            root.find('model').set('name', self.model)
+            root.find('model').set('name', self.release_model)
             link = root.find('.//link')
-            link.find('kinematic').text = 'false'
-            link.find('gravity').text = 'true'
+            for tag, value in (('kinematic', 'false'), ('gravity', 'true')):
+                element = link.find(tag)
+                if element is None:
+                    element = ET.SubElement(link, tag)
+                element.text = value
+            for collision in link.findall('collision'):
+                if not collision.get('name', '').startswith('contact_stalk_'):
+                    contact_only = collision.find('surface/contact/collide_without_contact')
+                    if contact_only is not None:
+                        contact_only.text = 'false'
             sdf = ET.tostring(root, encoding='unicode')
             request = SpawnEntity.Request()
-            request.name = self.model
+            request.name = self.release_model
             request.xml = sdf
             request.robot_namespace = ''
-            request.initial_pose = pose_msg(drop_pose)
+            request.initial_pose = pose_msg(self.drop_pose)
             request.reference_frame = 'world'
+            self.pending_model_request = True
             spawned = self.spawn_model.call_async(request)
             spawned.add_done_callback(self.release_done)
         except Exception as error:
             self.pending_model_request = False
             self.hold_error = f'fruit dynamic respawn failed: {error}'
+            self.flush()
 
     def release_done(self, future):
         self.pending_model_request = False
@@ -403,9 +523,19 @@ class HarvestPhysicsArbiter(Node):
             result = future.result()
             if not result.success:
                 raise RuntimeError(getattr(result, 'status_message', 'SpawnEntity failed'))
+            released_pose = self.drop_pose
+            self.drop_pose = None
             self.held = False
+            self.release_requested = False
+            self.hold_error = None
             self.evidence['state'] = 'RELEASED'
-            self.evidence['release'] = {'dynamics_enabled': True, 'sim_time_s': self.get_clock().now().nanoseconds / 1e9}
+            self.evidence['release'] = {
+                'model_name': self.release_model,
+                'dynamics_enabled': True,
+                'sim_time_s': self.get_clock().now().nanoseconds / 1e9,
+                'initial_position_world_m': released_pose[0],
+                'initial_rotation_world_xyzw': released_pose[1],
+            }
             self.flush()
         except Exception as error:
             self.hold_error = f'fruit spawn failed: {error}'

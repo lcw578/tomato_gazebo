@@ -23,6 +23,7 @@ from xc_interfaces.msg import MidpointReached, TestResult
 from xc_interfaces.srv import ControlAGV, GripperControl, MoveJoints, MoveToPose
 
 from tomato_sim_adapters.arm_kinematics import OEM_HOME
+from tomato_sim_adapters.harvest_physics_arbiter import fruit_body_containment
 
 from simulation_config import harvest_launch_defaults, load_configuration, workspace
 
@@ -272,6 +273,26 @@ class Phase3Checks(Node):
     def return_to_box_pose(self):
         self.call(self.return_box, MoveToPose.Request(), 'return to basket', timeout=300)
 
+    def settled_payload(self, timeout=60, model_name=None):
+        deadline = time.monotonic() + timeout
+        stable_since = None
+        while time.monotonic() < deadline:
+            state = self.entity_state(model_name or SCENE['target_model'])
+            velocity = state.twist.linear
+            speed = math.sqrt(velocity.x**2 + velocity.y**2 + velocity.z**2)
+            now = self.get_clock().now().nanoseconds / 1e9
+            if speed < 0.02:
+                if stable_since is None:
+                    stable_since = now
+                if now - stable_since >= 0.5:
+                    return state, {'linear_speed_m_s': speed,
+                                   'stable_sim_duration_s': now - stable_since,
+                                   'sample_sim_time_s': now}
+            else:
+                stable_since = None
+            rclpy.spin_once(self, timeout_sec=0.05)
+        raise RuntimeError('Released fruit did not settle below 0.02 m/s for 0.5 simulated seconds')
+
     def camera_snapshot(self):
         self.wait_for(lambda: self.rgb is not None and self.depth is not None and self.info is not None,
                       'RGB-D camera frames')
@@ -364,17 +385,19 @@ class Phase3Checks(Node):
         self.command_gripper('open')
         self.wait_for(lambda: json.loads((WORKSPACE / 'validation/phase3_runtime.json').read_text())
                       .get('state') == 'RELEASED', 'dynamic release')
-        settle_end = time.monotonic() + 4.0
-        while time.monotonic() < settle_end:
-            rclpy.spin_once(self, timeout_sec=0.05)
-        released_state = pose_from_entity(self.entity_state(SCENE['target_model']))
+        release = json.loads((WORKSPACE / 'validation/phase3_runtime.json').read_text())['release']
+        settled_state, settling = self.settled_payload(model_name=release['model_name'])
+        released_state = pose_from_entity(settled_state)
         basket_tf = self.transform('world', 'basket_link')
         basket_pos = np.array([basket_tf.translation.x, basket_tf.translation.y, basket_tf.translation.z])
         basket_rot = Rotation.from_quat([basket_tf.rotation.x, basket_tf.rotation.y,
                                          basket_tf.rotation.z, basket_tf.rotation.w])
         fruit_in_basket = basket_rot.inv().apply(released_state[0] - basket_pos)
-        in_basket = bool(abs(fruit_in_basket[0]) < 0.16 and abs(fruit_in_basket[1]) < 0.21
-                         and 0.10 < fruit_in_basket[2] < 0.32)
+        containment = fruit_body_containment(
+            WORKSPACE / 'validation/phase3' / SCENE.get(
+                'release_sdf', 'models/phase3_fruit_truss_9_1/model.sdf'),
+            (fruit_in_basket, (basket_rot.inv() * released_state[1]).as_quat()))
+        in_basket = containment['inside']
         after = self.camera_snapshot()
         camera = self.camera_removal_check(before, after, fruit_before[0])
         final_runtime = json.loads((WORKSPACE / 'validation/phase3_runtime.json').read_text())
@@ -389,6 +412,8 @@ class Phase3Checks(Node):
             'follow_displacement_m': follow_displacement,
             'main_stem_contacts': contacts_positive,
             'release_position_in_basket_frame_m': fruit_in_basket.tolist(),
+            'basket_containment': containment,
+            'settling': settling,
             'in_basket': in_basket,
             'camera_original_roi': camera,
         }
