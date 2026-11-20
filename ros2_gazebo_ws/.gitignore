@@ -1,0 +1,23 @@
+/.overlay/
+/.overlay-build.lock
+/build/
+/install/
+/log/
+/validation/
+/.venv_ros/
+/.venv_yolo/
+/.pip_cache/
+/frames_*.gv
+/frames_*.pdf
+
+# Legacy local overlay and external AUBO assets
+/src/xc_interfaces
+/src/vision_tomato_interfaces
+/src/vision_pose_generate
+/src/xc_robot_main_control/
+/src/closed_loop_feedback_detection/
+/src/aubo_description/mesh
+/src/aubo_description/urdf
+
+# CAD export from the standalone MuJoCo assembly
+/src/tomato_sim_description/meshes/

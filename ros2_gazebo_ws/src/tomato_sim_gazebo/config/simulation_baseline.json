@@ -1,0 +1,51 @@
+{
+  "baseline_id": "tomato_corridor_v4",
+  "world": "tomato_corridor_v4.world",
+  "arm_base_yaw_deg": 180.0,
+  "arm_mount_reason": "User installation: keep the arm clear of the scene cameras",
+  "slide_initial_m": 0.3,
+  "lift_height_m": 0.0,
+  "camera_angle_deg": 14.0,
+  "camera_tilt_deg": 0.0,
+  "camera_hfov_deg": 70.0,
+  "candidate_harvest_station": {
+    "plant_instance": "plant_0_8_1",
+    "target_truss": "9_1",
+    "rail_m": 1.25,
+    "lift_m": 0.5,
+    "right_camera_angle_deg": 32.0,
+    "right_camera_tilt_deg": 25.0,
+    "validated": false
+  },
+  "notes": [
+    "The zero lift value is an assembly check setting, not a validated harvesting height",
+    "Preserve the v4 map, rails, plant positions and support slope",
+    "Historical single_plant_verify results do not validate this baseline",
+    "The 8 m visual rails and the existing +/-2.5 m robot joint travel differ"
+  ],
+  "track_entity": "robot_track_v4",
+  "plant_count": 60,
+  "rail_top_z_m": 0.04,
+  "dependencies": {
+    "robot_root": {
+      "env": "TOMATO_ROBOT_SOURCE",
+      "default": "../robot_ws_fixed-v1.0-master"
+    },
+    "asset_root": {
+      "env": "TOMATO_GAZEBO_ASSETS",
+      "default": "../gazebo_migration"
+    },
+    "yolo_weights": {
+      "env": "TOMATO_YOLO_WEIGHTS",
+      "default": "../assets/weights/tomato-seg2025063018-yolov8-xucan.pt"
+    },
+    "ros_python": {
+      "env": "TOMATO_ROS_PYTHON",
+      "default": ".venv_ros/bin/python"
+    },
+    "yolo_python": {
+      "env": "TOMATO_YOLO_PYTHON",
+      "default": ".venv_yolo/bin/python"
+    }
+  }
+}

@@ -1,0 +1,167 @@
+{
+  "baseline": {
+    "baseline_id": "tomato_corridor_v4",
+    "world": "/data/tomato_gazebo/gazebo_migration/tomato_corridor_v4.world",
+    "arm_base_yaw_deg": 180.0,
+    "arm_mount_reason": "User installation: keep the arm clear of the scene cameras",
+    "slide_initial_m": 0.3,
+    "lift_height_m": 0.0,
+    "camera_angle_deg": 14.0,
+    "camera_tilt_deg": 0.0,
+    "camera_hfov_deg": 70.0,
+    "candidate_harvest_station": {
+      "plant_instance": "plant_0_8_1",
+      "target_truss": "9_1",
+      "rail_m": 1.25,
+      "lift_m": 0.5,
+      "right_camera_angle_deg": 32.0,
+      "right_camera_tilt_deg": 25.0,
+      "validated": false
+    },
+    "notes": [
+      "The zero lift value is an assembly check setting, not a validated harvesting height",
+      "Preserve the v4 map, rails, plant positions and support slope",
+      "Historical single_plant_verify results do not validate this baseline",
+      "The 8 m visual rails and the existing +/-2.5 m robot joint travel differ"
+    ],
+    "track_entity": "robot_track_v4",
+    "plant_count": 60,
+    "rail_top_z_m": 0.04
+  },
+  "passed": true,
+  "scope": "static assembly and live Gazebo camera only; no harvest acceptance",
+  "dependencies": {
+    "recorded_at": "2026-11-20T03:16:11.374362+00:00",
+    "robot_source": {
+      "root": "/data/robot_ws_fixed-v1.0-master",
+      "git_head": null,
+      "delivery_reference": {
+        "archive": "robot_ws_fixed-v1.0-master.zip",
+        "sha256": "2c60d51ed38741449bcdd69fad1ccdba1dfe049bf895760c2d5eadce5a369cb2",
+        "git_archive_revision": "071a3a1ae5932686688d6010642fdaac329ac247"
+      },
+      "files": {
+        "src/xc_robot_main_control/launch/robot_launch.py": {
+          "sha256": "087d33c6af1bec58f13900b4e35724c8320e57395f36967bc43dce6eeccf1b61",
+          "matches_delivery": false,
+          "matches_audited_workspace": true
+        },
+        "src/xc_robot_main_control/xc_robot_main_control/xc_robot_main_control_node.py": {
+          "sha256": "ddedeeccce38916ab5af97a65a684524fc8f4738fd99ba13f8d56547d067b60f",
+          "matches_delivery": false,
+          "matches_audited_workspace": true
+        },
+        "src/xc_robot_main_control/xc_robot_main_control/yolov8_service.py": {
+          "sha256": "2afd1a018584831ab50932db0e6790770b655a8a4e9d55a09859c1fe0141add8",
+          "matches_delivery": false,
+          "matches_audited_workspace": true
+        }
+      }
+    },
+    "map": {
+      "asset_root": "/data/tomato_gazebo/gazebo_migration",
+      "baseline_id": "tomato_corridor_v4",
+      "world": "/data/tomato_gazebo/gazebo_migration/tomato_corridor_v4.world",
+      "world_name": "tomato_corridor_v4",
+      "sha256": "90c63297014a3a6cff10929fced3fe2f33e3ab9e7faacaba2a6d790e86bef2c3"
+    },
+    "yolo_weights": {
+      "path": "/data/tomato_gazebo/assets/weights/tomato-seg2025063018-yolov8-xucan.pt",
+      "sha256": "22e7ab93d69bd98cf07411452e3924fc9f126dddcb30fa773d61030eae9b7c92"
+    },
+    "python": {
+      "ros_python": "/data/tomato_gazebo/ros2_gazebo_ws/.venv_ros/bin/python",
+      "yolo_python": "/data/tomato_gazebo/ros2_gazebo_ws/.venv_yolo/bin/python"
+    }
+  },
+  "launch_world": {
+    "source_world": "/data/tomato_gazebo/gazebo_migration/tomato_corridor_v4.world",
+    "source_sha256": "90c63297014a3a6cff10929fced3fe2f33e3ab9e7faacaba2a6d790e86bef2c3",
+    "arm_base_yaw_deg": 180.0,
+    "runtime_world": "/data/tomato_gazebo/ros2_gazebo_ws/validation/runtime_worlds/tomato_corridor_v4_ros_95376.world",
+    "world_name": "tomato_corridor_v4",
+    "change": "gazebo_ros_state WorldPlugin only; map layout unchanged"
+  },
+  "source_world_sha256": "90c63297014a3a6cff10929fced3fe2f33e3ab9e7faacaba2a6d790e86bef2c3",
+  "world_name": "tomato_corridor_v4",
+  "plant_count": 60,
+  "arm_mount_rpy_deg": [
+    180.0,
+    0.0,
+    180.0
+  ],
+  "carriage": {
+    "world_xyz_m": [
+      0.30000014525426694,
+      0.0,
+      0.04
+    ],
+    "tf_world_rpy_deg": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "cad_datum_note": "chassis_cad_datum has an intentional pi roll; carriage is the level reference",
+    "gazebo_world_rpy_deg": [
+      2.3217272209327513e-08,
+      5.178619843458821e-08,
+      -7.118742358084141e-09
+    ],
+    "gazebo_world_xyz_m": [
+      0.30000014782442563,
+      1.3648813849964636e-10,
+      0.03999999974351759
+    ]
+  },
+  "arm_base_world_quaternion_xyzw": [
+    7.498798913309288e-33,
+    0.0,
+    1.0,
+    -6.123233995736766e-17
+  ],
+  "stationary_window": {
+    "wall_duration_s": 1.9741681150044315,
+    "samples": 36,
+    "max_home_error_rad": 0.00018136104856836255,
+    "max_arm_velocity_rad_s": 0.0010040741364216686,
+    "rail_min_max_m": [
+      0.30000011095760587,
+      0.30000014626299226
+    ]
+  },
+  "track_entity_present": true,
+  "track_entity_world_xyz_m": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "scene_camera_rgb": {
+    "file": "/data/tomato_gazebo/ros2_gazebo_ws/validation/v4_baseline/20261120T031611-92132/gazebo_v4_rgb.png",
+    "topic": "/camera/color/image_raw",
+    "frame_id": "cam_right_color_optical_frame",
+    "stamp": {
+      "sec": 1,
+      "nanosec": 789000000
+    },
+    "dimensions": [
+      848,
+      480
+    ],
+    "engine": "Gazebo Classic 11"
+  },
+  "depth_encoding": "16UC1",
+  "overview": {
+    "file": "/data/tomato_gazebo/ros2_gazebo_ws/validation/v4_baseline/20261120T031611-92132/gazebo_v4_robot_overview.png",
+    "topic": "/sim/validation/overview/overview/image_raw",
+    "frame_id": "v4_validation_camera",
+    "stamp": {
+      "sec": 2,
+      "nanosec": 334000000
+    },
+    "dimensions": [
+      960,
+      600
+    ],
+    "engine": "Gazebo Classic 11"
+  }
+}

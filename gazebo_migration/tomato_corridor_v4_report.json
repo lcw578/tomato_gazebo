@@ -1,0 +1,21 @@
+{
+  "length_m": 8.0,
+  "pot_bottom_end_heights_m": [
+    0.65,
+    0.725
+  ],
+  "support_pitch_deg": 0.5371558016242873,
+  "row_centers_y_m": [
+    -0.75,
+    0.75
+  ],
+  "planter_spacing_m": 0.5345762711864407,
+  "far_end_clearance_m": 0.055932203389830626,
+  "planters": 30,
+  "plants": 60,
+  "plant_collision_shapes": 2940,
+  "plant_collision_geometry": "source stem mesh and fruit spheres",
+  "rail_outer_width_m": 0.55,
+  "rail_diameter_m": 0.05,
+  "ceiling_lamps": 0
+}

@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:macro name="controlled_joint" params="name command initial:=0.0">
+    <joint name="${name}">
+      <command_interface name="${command}"/>
+      <state_interface name="position"><param name="initial_value">${initial}</param></state_interface>
+      <state_interface name="velocity"/>
+    </joint>
+  </xacro:macro>
+  <xacro:macro name="finger_control" params="name multiplier">
+    <joint name="${name}">
+      <param name="mimic">gripper_joint</param>
+      <param name="multiplier">${multiplier}</param>
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+  </xacro:macro>
+  <xacro:macro name="tomato_control">
+    <gazebo>
+      <plugin name="tomato_sim_joint_initializer" filename="libtomato_sim_joint_initializer.so">
+        <joint name="machine_slide" position="$(arg slide_initial)"/>
+        <joint name="shoulder_joint" position="0.1801179788"/>
+        <joint name="upperArm_joint" position="0.2682571060"/>
+        <joint name="foreArm_joint" position="2.3396138623"/>
+        <joint name="wrist1_joint" position="2.0429078895"/>
+        <joint name="wrist2_joint" position="1.5119787310"/>
+        <joint name="wrist3_joint" position="0.0"/>
+        <joint name="gripper_joint" position="-0.45"/>
+      </plugin>
+    </gazebo>
+    <ros2_control name="TomatoGazeboSystem" type="system">
+      <hardware><plugin>gazebo_ros2_control/GazeboSystem</plugin></hardware>
+      <xacro:controlled_joint name="machine_slide" command="velocity"
+                              initial="$(arg slide_initial)"/>
+      <xacro:controlled_joint name="shoulder_joint" command="position" initial="0.1801179788"/>
+      <xacro:controlled_joint name="upperArm_joint" command="position" initial="0.2682571060"/>
+      <xacro:controlled_joint name="foreArm_joint" command="position" initial="2.3396138623"/>
+      <xacro:controlled_joint name="wrist1_joint" command="position" initial="2.0429078895"/>
+      <xacro:controlled_joint name="wrist2_joint" command="position" initial="1.5119787310"/>
+      <xacro:controlled_joint name="wrist3_joint" command="position" initial="0.0"/>
+      <xacro:controlled_joint name="gripper_joint" command="position" initial="-0.45"/>
+      <xacro:finger_control name="left_finger_joint" multiplier="-0.020999"/>
+      <xacro:finger_control name="right_finger_joint" multiplier="-0.020995"/>
+    </ros2_control>
+    <gazebo>
+      <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
+        <robot_param>robot_description</robot_param>
+        <robot_param_node>robot_state_publisher</robot_param_node>
+        <parameters>$(find tomato_sim_description)/config/controllers.yaml</parameters>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+</robot>

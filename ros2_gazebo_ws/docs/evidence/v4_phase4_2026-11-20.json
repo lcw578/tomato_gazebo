@@ -1,0 +1,39 @@
+{
+  "phase": 4,
+  "baseline_id": "tomato_corridor_v4",
+  "source_world": "/data/tomato_gazebo/gazebo_migration/tomato_corridor_v4.world",
+  "source_world_sha256": "90c63297014a3a6cff10929fced3fe2f33e3ab9e7faacaba2a6d790e86bef2c3",
+  "model_path": "/data/tomato_gazebo/ros2_gazebo_ws/.overlay/install/xc_robot_main_control/share/xc_robot_main_control/weights/best.pt",
+  "model_classes": [
+    "stem",
+    "tomato",
+    "trunk"
+  ],
+  "moge_depth_bypassed": true,
+  "depth_source": "/camera/aligned_depth_to_color/image_raw",
+  "tcp_reference": "tool_tcp; adapter reverses the main controller 0.10 m request offset",
+  "vision": null,
+  "rgb_frame_count": 2,
+  "rgb_frame_file": "/data/tomato_gazebo/ros2_gazebo_ws/validation/phase4_rgb.png",
+  "detection2ui_messages": 2,
+  "peak_detection_boxes_per_class": {
+    "stem": 0,
+    "tomato": 7,
+    "trunk": 5
+  },
+  "test_result_2_received": false,
+  "test_result_3_received": false,
+  "x1_triggered": false,
+  "cut_success": false,
+  "tcp_final_error_mm": null,
+  "main_stem_contacts": 0,
+  "runtime_state": "ATTACHED_TO_STEM",
+  "release": {},
+  "stage_times_s": {
+    "detection_to_feedback": null,
+    "feedback_to_cut": null,
+    "cut_to_release": null,
+    "detection_to_release": null
+  },
+  "passed": false
+}

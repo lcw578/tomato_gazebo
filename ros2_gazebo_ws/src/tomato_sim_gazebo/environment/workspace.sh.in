@@ -1,0 +1,3 @@
+if [ -z "${TOMATO_SIM_WORKSPACE:-}" ]; then
+  export TOMATO_SIM_WORKSPACE="@CMAKE_CURRENT_SOURCE_DIR@/../.."
+fi

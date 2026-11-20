@@ -1,0 +1,32 @@
+version: 3
+units: m
+longitudinal_axis: x
+measurements:
+  planter:
+    length: 0.46
+    width: 0.23
+    height: 0.17
+    pots_per_support: 60
+    supports_per_corridor: 2
+    plants_per_pot: 2
+    plant_root_spacing: 0.20
+    end_alignment: planter_outer_edges_flush_with_support_ends
+  support:
+    length: 32.0
+    cross_section_width: 0.23
+    cross_section_height: 0.16
+    bottom_height_at_x_min: 0.65
+    bottom_height_at_x_max: 0.95
+  track:
+    rail_outer_width: 0.55
+    rail_diameter: 0.05
+    planter_center_offset_from_track_center: 0.75
+  plant_rows:
+    center_spacing: 1.50
+  lighting:
+    ceiling_lamps: false
+derived:
+  planter_center_spacing: 0.5345762711864407
+  track_center_spacing: 0.50
+  support_pitch_rad: 0.009374725353535925
+  support_pitch_deg: 0.537222

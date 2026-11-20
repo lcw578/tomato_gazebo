@@ -1,0 +1,190 @@
+--- a/src/xc_robot_main_control/launch/robot_launch.py
++++ b/src/xc_robot_main_control/launch/robot_launch.py
+@@ -95,8 +95,8 @@
+     # 末端反馈节点（注意修改末端相机的编号）
+     action_end_effector_feedback_node = launch_ros.actions.Node(
+         package='closed_loop_feedback_detection',
+-        executable='image_captured_detection_sub',
+-        name='image_captured_detection_sub',
++        executable='imimage_captured_detection_subage_captured_detection_sub',
++        name='',
+         output='screen'
+     )
+ 
+@@ -112,5 +112,5 @@
+         # action_car_nav_node, # 底盘导航节点
+         action_car_alaws_go_node, # 底盘一直直行节点
+         action_end_effector_control_node, # 末端执行器控制节点（开和闭）
+-        action_end_effector_feedback_node, # 末端反馈节点（注意修改末端相机的编号）
++        # action_end_effector_feedback_node, # 末端反馈节点（注意修改末端相机的编号）
+     ])
+\ No newline at end of file
+--- a/src/xc_robot_main_control/xc_robot_main_control/xc_robot_main_control_node.py
++++ b/src/xc_robot_main_control/xc_robot_main_control/xc_robot_main_control_node.py
+@@ -26,7 +26,6 @@
+ from rcl_interfaces.msg import Parameter, ParameterValue
+ from rclpy.parameter import ParameterType
+ from xc_robot_main_control.stemGrowthAndPoints import StemGrowthAndPoints
+-from xc_robot_main_control.moge.moGeDepthEstimator import MoGeDepthEstimator
+ 
+ import os
+ import signal
+@@ -63,16 +62,22 @@
+         self.is_use_base_angle=True #True就表示果梗切线角度转换到基座坐标系后计算，False就只使用图像计算切线角度
+         self.is_two_stage=False #True就表示采用两阶段采摘，False就采用单阶段采摘
+ 
+-        self.is_use_moge_depth_estimator=False #True就使用MoGe深度估计器，False就不使用
++        self.declare_parameter('use_moge_depth_estimator', False)
++        self.is_use_moge_depth_estimator = self.get_parameter('use_moge_depth_estimator').value
+         # 末端执行器的长度 单位是m
+-        self.gripper_length=0.10
++        self.declare_parameter('gripper_length', 0.10)
++        self.gripper_length = self.get_parameter('gripper_length').value
+ 
+         # 机械臂X方向误差修正  单位是m
+         self.arm_x_error_modify=0
+         # 初始化工作相机编号标志 1或者2 1为左相机 2为右相机
+-        self.camera_working_flag = 1
++        self.declare_parameter('camera_working_flag', 1)
++        self.camera_working_flag = self.get_parameter('camera_working_flag').value
+         #设定手眼标定文件路径
+-        self.hand_eye_main_path="/home/xc/code/test/ros2/robot_ws/src/hand_eye_calibration_python/config/"# 机器人工控机
++        self.declare_parameter(
++            'hand_eye_main_path',
++            '/home/xc/code/test/ros2/robot_ws/src/hand_eye_calibration_python/config/')
++        self.hand_eye_main_path = self.get_parameter('hand_eye_main_path').value
+         # self.hand_eye_main_path="/home/xucan/code/test/robot_ws/src/hand_eye_calibration_python/config/" # xc 办公室 WSL
+         # self.hand_eye_main_path="/home/xc_home_wsl/code/test/ROS2/robot_ws/src/hand_eye_calibration_python/config/" # xc 家中 WSL
+ 
+@@ -90,7 +95,11 @@
+         self.is_detection_processing = False
+ 
+         # 初始化是否为真实相机数据标志
+-        self.is_real_camera_data = True
++        self.declare_parameter('is_real_camera_data', True)
++        self.is_real_camera_data = self.get_parameter('is_real_camera_data').value
++        self.declare_parameter('manage_external_camera_processes', True)
++        self.manage_external_camera_processes = self.get_parameter(
++            'manage_external_camera_processes').value
+         # 初始化内参获取标志
+         self.intrinsics_ready = False
+         self.growth_point_calculator=StemGrowthAndPoints()
+@@ -114,6 +123,8 @@
+             depth_model_path = os.path.join(share_dir, 'weights', 'moge-2-vits-normal.pt')
+             self.get_logger().info(f"MoGe模型路径: {depth_model_path}")
+             try:
++                from xc_robot_main_control.moge.moGeDepthEstimator import MoGeDepthEstimator
++
+                 self.depth_estimator = MoGeDepthEstimator(model_path=depth_model_path)
+                 self.get_logger().info("MoGe深度估计器初始化成功")
+             except Exception as e:
+@@ -374,6 +385,18 @@
+             # depth_image_cv = self.bridge.imgmsg_to_cv2(depth_msg, "passthrough")
+             # self.get_logger().info(f"image_callback中depth_image_cv深度图的深度值: {depth_image_cv[394,50]}")
+             """异步调用YOLO服务"""
++            if not self.yolo_client.service_is_ready():
++                self.get_logger().warning(
++                    "YOLO服务尚未就绪，本帧跳过并等待下一帧",
++                    throttle_duration_sec=2.0)
++                with self.processing_lock:
++                    self.is_processing = False
++                return
++            self.get_logger().info(
++                f"提交YOLO请求: service_ready={self.yolo_client.service_is_ready()}, "
++                f"rgb={color_msg.width}x{color_msg.height}/{color_msg.encoding}, "
++                f"depth={depth_msg.encoding}, depth_scale={self.depth_scale}, "
++                f"real_camera={self.is_real_camera_data}")
+             # self.get_logger().info("*******本帧数据处理已完成，所有番茄完成检测和采摘*******")
+             future_yolo_client = self.yolo_client.call_async(request)
+             future_yolo_client.add_done_callback(lambda future: self.detection_callback(future))
+@@ -888,6 +911,7 @@
+ # 主程序 main
+     def detection_callback(self, future):
+         try:
++            self.get_logger().info("收到YOLO异步响应")
+             # 底盘停止后的尝试次数
+             # self.get_logger().warning("进入了detection_callback主程序")
+             
+@@ -2034,6 +2058,9 @@
+         2. 新增方式：通过关键词 "-r __node:=camera" 杀死所有匹配的进程。
+         """
+ 
++        if not self.manage_external_camera_processes:
++            return
++
+         # === 方式一：读取 PID 文件并终止对应的 launch 进程 ===
+         pid_file = PID_FILE
+         if os.path.exists(pid_file):
+@@ -2113,6 +2140,8 @@
+ 
+     def start_new_camera_launch(self):
+         """启动新的相机 launch：xc_robot_main_control/realsense_hot_change_launch_1.py"""
++        if not self.manage_external_camera_processes:
++            return
+         self.get_logger().info(f"[INFO] self.camera_working_flag的值是：{self.camera_working_flag}")
+         if self.camera_working_flag == 1:
+             self.get_logger().info(f"[INFO] 我要把相机变为2")            
+@@ -2438,7 +2467,6 @@
+                     self.intrinsics.model = rs2.distortion.kannala_brandt4
+                 self.intrinsics.coeffs = [i for i in msg.d]
+                 self.intrinsics_ready = True
+-                self.is_real_camera_data = True
+                 #取消订阅
+                 self.destroy_subscription(self.camera_info_sub)
+                 self.camera_info_sub = None
+@@ -2514,7 +2542,7 @@
+ 
+         executor.remove_node(node)
+         node.destroy_node()
+-        rclpy.shutdown()
++        rclpy.try_shutdown()
+ 
+ if __name__ == '__main__':
+     main()
+--- a/src/xc_robot_main_control/xc_robot_main_control/yolov8_service.py
++++ b/src/xc_robot_main_control/xc_robot_main_control/yolov8_service.py
+@@ -55,7 +55,9 @@
+         ]
+ 
+     def detect_objects(self, request, response):
++        started = time.monotonic()
+         try:
++            self.get_logger().info("收到图像检测请求")
+             # self.get_logger().info("*"*40)
+             
+             # 1. 图像转换
+@@ -163,23 +165,29 @@
+             # cv.imwrite(save_path, annotated_image)
+             # self.get_logger().info(f"已保存标注图像到: {save_path}")
+             
++            self.get_logger().info(
++                f"检测响应完成: boxes={len(response.class_ids)}, "
++                f"masks={len(response.masks)}, elapsed={time.monotonic() - started:.3f}s")
+             return response
+             
+         except Exception as e:
+-            self.get_logger().error(f"目标检测错误: {str(e)}")
++            self.get_logger().error(
++                f"目标检测错误(耗时{time.monotonic() - started:.3f}s): {str(e)}")
+             return response
+ 
+ def main(args=None):
+     rclpy.init(args=args)
++    service = None
+     try:
+         service = YOLOv8Service()
+         service.get_logger().info("YOLOv8服务节点创建成功，开始运行...")
+         rclpy.spin(service)
+-    except Exception as e:
+-        service.get_logger().error(f"服务启动失败: {str(e)}")
++    except (KeyboardInterrupt, rclpy.executors.ExternalShutdownException):
++        pass
+     finally:
+-        service.destroy_node()
+-        rclpy.shutdown()
++        if service is not None:
++            service.destroy_node()
++        rclpy.try_shutdown()
+ 
+ if __name__ == '__main__':
+     main()

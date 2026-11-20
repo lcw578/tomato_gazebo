@@ -1,0 +1,188 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:macro name="chassis_cad" params="">
+    <inertial>
+      <origin xyz="0.015086573 0.013393585 -0.1609009" rpy="0 0 0" />
+      <mass value="62.816035" />
+      <inertia ixx="2.1514412" iyy="5.090887" izz="4.3724318" ixy="-0.046783404" ixz="-0.00320244" iyz="-0.023205715" />
+    </inertial>
+    <visual name="lift_col_outer">
+      <origin xyz="0.002 0 -0.4886" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.055" length="0.13" />
+      </geometry>
+      <material name="lift_col_outer">
+        <color rgba="0.42 0.43 0.46 1" />
+      </material>
+    </visual>
+    <visual name="chassis_0">
+      <geometry>
+        <mesh filename="package://tomato_sim_description/meshes/chassis_0.stl" />
+      </geometry>
+      <material name="chassis_0">
+        <color rgba="0.55 0.57 0.60 1" />
+      </material>
+    </visual>
+  </xacro:macro>
+  <xacro:macro name="lift_cad" params="">
+    <inertial>
+      <origin xyz="0.14274594 0.009534775 -0.74663947" rpy="0 0 0" />
+      <mass value="20.242321" />
+      <inertia ixx="0.11409244" iyy="2.9485618" izz="2.83687" ixy="0.0027965308" ixz="0.093049464" iyz="-0.00027075438" />
+    </inertial>
+    <visual name="lift_col_inner">
+      <origin xyz="0.002 0 -0.3536" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.042" length="0.6" />
+      </geometry>
+      <material name="lift_col_inner">
+        <color rgba="0.60 0.61 0.64 1" />
+      </material>
+    </visual>
+    <visual name="lift_0">
+      <geometry>
+        <mesh filename="package://tomato_sim_description/meshes/lift_0.stl" />
+      </geometry>
+      <material name="lift_0">
+        <color rgba="0.55 0.57 0.60 1" />
+      </material>
+    </visual>
+  </xacro:macro>
+  <xacro:macro name="basket_cad" params="">
+    <visual name="basket_0">
+      <geometry>
+        <mesh filename="package://tomato_sim_description/meshes/basket_0.stl" />
+      </geometry>
+      <material name="basket_0">
+        <color rgba="0.55 0.57 0.60 1" />
+      </material>
+    </visual>
+    <collision name="crate_col_0">
+      <origin xyz="0 0 0.169379" rpy="0 0 0" />
+      <geometry>
+        <box size="0.34 0.45 0.03" />
+      </geometry>
+    </collision>
+    <collision name="crate_col_1">
+      <origin xyz="-0.17 0 0.100379" rpy="0 0 0" />
+      <geometry>
+        <box size="0.04 0.45 0.15" />
+      </geometry>
+    </collision>
+    <collision name="crate_col_2">
+      <origin xyz="0.17 0 0.100379" rpy="0 0 0" />
+      <geometry>
+        <box size="0.04 0.45 0.15" />
+      </geometry>
+    </collision>
+    <collision name="crate_col_3">
+      <origin xyz="0 0.225 0.100379" rpy="0 0 0" />
+      <geometry>
+        <box size="0.34 0.04 0.15" />
+      </geometry>
+    </collision>
+    <collision name="crate_col_4">
+      <origin xyz="0 -0.225 0.100379" rpy="0 0 0" />
+      <geometry>
+        <box size="0.34 0.04 0.15" />
+      </geometry>
+    </collision>
+  </xacro:macro>
+  <xacro:macro name="cutter_cad" params="">
+    <inertial>
+      <origin xyz="0.010859 0.006547 -0.003183" rpy="0 0 0" />
+      <mass value="0.348363" />
+      <inertia ixx="0.000394488" iyy="0.000557312" izz="0.000646813" ixy="-0.00012937012" ixz="-8.98267e-06" iyz="-9.04808e-06" />
+    </inertial>
+    <visual name="cutter_0">
+      <geometry>
+        <mesh filename="package://tomato_sim_description/meshes/cutter_0.stl" />
+      </geometry>
+      <material name="cutter_0">
+        <color rgba="0.58 0.59 0.62 1" />
+      </material>
+    </visual>
+    <visual name="cutter_1">
+      <geometry>
+        <mesh filename="package://tomato_sim_description/meshes/cutter_1.stl" />
+      </geometry>
+      <material name="cutter_1">
+        <color rgba="0.15 0.15 0.16 1" />
+      </material>
+    </visual>
+    <visual name="cutter_2">
+      <geometry>
+        <mesh filename="package://tomato_sim_description/meshes/cutter_2.stl" />
+      </geometry>
+      <material name="cutter_2">
+        <color rgba="0.62 0.63 0.66 1" />
+      </material>
+    </visual>
+  </xacro:macro>
+  <xacro:macro name="gear_cad" params="">
+    <inertial>
+      <origin xyz="3.0045713e-07 -1.0867786e-05 0.026885779" rpy="-0.00019754542068 -3.3841453373e-07 0.02670238144" />
+      <mass value="0.022650932" />
+      <inertia ixx="2.8015663e-06" iyy="2.7182082e-06" izz="4.5617203e-06" ixy="0" ixz="0" iyz="0" />
+    </inertial>
+    <visual name="gear_0">
+      <geometry>
+        <mesh filename="package://tomato_sim_description/meshes/gear_0.stl" />
+      </geometry>
+      <material name="gear_0">
+        <color rgba="0.50 0.51 0.54 1" />
+      </material>
+    </visual>
+  </xacro:macro>
+  <xacro:macro name="gear_origin" params="">
+    <origin xyz="1.89e-09 2.2e-09 -0.0047500006" rpy="-3.1415926072 0 0" />
+  </xacro:macro>
+  <xacro:macro name="left_finger_cad" params="">
+    <inertial>
+      <origin xyz="0.0074745805 0.018070037 -0.0079754345" rpy="0.092666088892 -0.27667612409 0.30636428918" />
+      <mass value="0.025656609" />
+      <inertia ixx="2.5231822e-05" iyy="6.8915999e-06" izz="2.2743687e-05" ixy="0" ixz="0" iyz="0" />
+    </inertial>
+    <visual name="left_finger_0">
+      <geometry>
+        <mesh filename="package://tomato_sim_description/meshes/left_finger_0.stl" />
+      </geometry>
+      <material name="left_finger_0">
+        <color rgba="0.50 0.51 0.54 1" />
+      </material>
+    </visual>
+  </xacro:macro>
+  <xacro:macro name="left_finger_origin" params="">
+    <origin xyz="0.0022603458 0.022856628 -0.042805662" rpy="-1.5710562 -0.00027471871 0" />
+  </xacro:macro>
+  <xacro:macro name="right_finger_cad" params="">
+    <inertial>
+      <origin xyz="-0.014051232 -0.017179277 -0.016396853" rpy="-0.079007341595 0.2481793744 0.3139912257" />
+      <mass value="0.023069919" />
+      <inertia ixx="2.2182048e-05" iyy="5.4852153e-06" izz="1.981857e-05" ixy="0" ixz="0" iyz="0" />
+    </inertial>
+    <visual name="right_finger_0">
+      <geometry>
+        <mesh filename="package://tomato_sim_description/meshes/right_finger_0.stl" />
+      </geometry>
+      <material name="right_finger_0">
+        <color rgba="0.50 0.51 0.54 1" />
+      </material>
+    </visual>
+  </xacro:macro>
+  <xacro:macro name="right_finger_origin" params="">
+    <origin xyz="0.0025000024 -0.032129281 -0.041864492" rpy="1.5492542 0 0" />
+  </xacro:macro>
+  <xacro:macro name="flange_origin" params="">
+    <origin xyz="0 0 0.050952" rpy="0 0 0" />
+  </xacro:macro>
+  <xacro:macro name="cutter_origin" params="">
+    <origin xyz="0 0 0" rpy="3.1415926536 0 1.5707963268" />
+  </xacro:macro>
+  <xacro:macro name="basket_origin" params="">
+    <origin xyz="-0.533 0.01 -0.88" rpy="0 0 0" />
+  </xacro:macro>
+  <xacro:macro name="wrist_camera_origin" params="">
+    <origin xyz="0.106042 -0.001376 0.025985" rpy="0.46364478057 1.5707836777 0.46365043743" />
+  </xacro:macro>
+</robot>

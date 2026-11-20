@@ -1,0 +1,32 @@
+{
+  "baseline_id": "tomato_corridor_v4",
+  "source_world": "/data/tomato_gazebo/gazebo_migration/tomato_corridor_v4.world",
+  "source_sha256": "90c63297014a3a6cff10929fced3fe2f33e3ab9e7faacaba2a6d790e86bef2c3",
+  "passed": true,
+  "original_includes_preserved": 94,
+  "plant_instances_preserved": 60,
+  "non_target_plant_instances_checked": 59,
+  "selected_target_geometry": {
+    "visual": {
+      "original_shapes_checked": 179,
+      "split_names": [],
+      "legacy_cut_boundary_joint_spheres_removed": [
+        "contact_stalk_joint_plant_036",
+        "contact_stalk_joint_plant_037",
+        "contact_stalk_joint_plant_038",
+        "contact_stalk_joint_plant_039",
+        "contact_stalk_joint_plant_040",
+        "contact_stalk_joint_plant_041",
+        "contact_stalk_joint_plant_042",
+        "contact_stalk_joint_plant_043"
+      ]
+    },
+    "collision": {
+      "original_shapes_checked": 49,
+      "split_names": [],
+      "legacy_cut_boundary_joint_spheres_removed": []
+    }
+  },
+  "cut_transform_error_m": 0.0,
+  "scope": "serialized scene integrity only; physical harvest not tested"
+}

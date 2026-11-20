@@ -1,0 +1,21 @@
+{
+  "delivery": {
+    "archive": "robot_ws_fixed-v1.0-master.zip",
+    "sha256": "2c60d51ed38741449bcdd69fad1ccdba1dfe049bf895760c2d5eadce5a369cb2",
+    "git_archive_revision": "071a3a1ae5932686688d6010642fdaac329ac247"
+  },
+  "files": {
+    "src/xc_robot_main_control/launch/robot_launch.py": {
+      "delivery_sha256": "e22631a17193faaa76fc51989fbcca93f3c742bd37b5298124c80544f616120b",
+      "workspace_sha256": "087d33c6af1bec58f13900b4e35724c8320e57395f36967bc43dce6eeccf1b61"
+    },
+    "src/xc_robot_main_control/xc_robot_main_control/xc_robot_main_control_node.py": {
+      "delivery_sha256": "590b34f399d55565429d69071bd58491991057b5034b0b33b06e9641752caab8",
+      "workspace_sha256": "ddedeeccce38916ab5af97a65a684524fc8f4738fd99ba13f8d56547d067b60f"
+    },
+    "src/xc_robot_main_control/xc_robot_main_control/yolov8_service.py": {
+      "delivery_sha256": "2b73cf83cf8b59fbb4fd71a48ee2b837b7eed366e7d11648f2c2b978fab54a3c",
+      "workspace_sha256": "2afd1a018584831ab50932db0e6790770b655a8a4e9d55a09859c1fe0141add8"
+    }
+  }
+}

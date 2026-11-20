@@ -1,0 +1,24 @@
+{
+  "v4_isolation": {
+    "passed": true,
+    "file_trace": "/data/tomato_gazebo/ros2_gazebo_ws/validation/v4_path_isolation_20261120T031912/file_access.trace",
+    "old_workspace_path_matches": 0
+  },
+  "v5_launch": {
+    "world": {
+      "source_world": "/data/tomato_gazebo/gazebo_migration/tomato_corridor_v5.world",
+      "source_sha256": "cb3ba82d1b4c331e2853bfa3b52d5611ed702eb7be66c5fdbb1c0489f4acb808",
+      "arm_base_yaw_deg": 180.0,
+      "runtime_world": "/data/tomato_gazebo/ros2_gazebo_ws/validation/runtime_worlds/tomato_corridor_v5_ros_97110.world",
+      "world_name": "tomato_corridor_v5",
+      "change": "gazebo_ros_state WorldPlugin only; map layout unchanged"
+    },
+    "active_controllers": [
+      "joint_state_broadcaster",
+      "slide_velocity_controller",
+      "arm_trajectory_controller",
+      "gripper_controller"
+    ]
+  },
+  "phase4_check_timeout_s": 60
+}
