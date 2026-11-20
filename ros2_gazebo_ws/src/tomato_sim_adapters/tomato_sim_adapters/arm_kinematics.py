@@ -76,3 +76,27 @@ class ArmKinematics:
         goal_tcp = kdl.Frame(rotation, kdl.Vector(*xyz))
         goal_wrist = goal_tcp * self.wrist_to_tcp.Inverse()
         return self.ik(list(goal_wrist.p), goal_wrist.M, seed, alternatives=alternatives)
+
+    def ik_basket(self, base_from_basket, seed):
+        # Basket CAD +Z points downward. Keep the release above both the
+        # basket site and the raised arm base so the cutter clears the lift deck.
+        release_z = min(-0.22, base_from_basket.Inverse().p.z() - 0.20)
+        basket_from_tcp = kdl.Frame(
+            kdl.Rotation.RPY(-np.pi / 3, np.pi / 4, -2 * np.pi / 5),
+            kdl.Vector(0.0, 0.0, release_z))
+        target = base_from_basket * basket_from_tcp
+        # Compare the two wrist configurations. A wrapped wrist solution can
+        # otherwise turn through the lift deck on the way back from OEM_HOME.
+        flipped_seed = np.asarray(seed).copy()
+        flipped_seed[3] -= np.pi
+        flipped_seed[4] *= -1
+        flipped_seed[5] -= np.pi
+        candidates = []
+        for candidate_seed in (seed, flipped_seed):
+            try:
+                candidates.append(self.ik_tcp(list(target.p), target.M, candidate_seed, alternatives=True))
+            except ValueError:
+                continue
+        if not candidates:
+            raise ValueError('No AUBO IK solution above the basket')
+        return min(candidates, key=lambda q: np.linalg.norm(q - seed))

@@ -13,6 +13,13 @@ from xc_interfaces.srv import GripperControl
 
 OPEN_RAD, CLOSED_RAD = -0.45, 0.4
 OPEN_PULSES, CLOSED_PULSES = 600, 2702
+FINGER_MULTIPLIERS = (-0.020999, -0.020995)
+
+
+def gripper_reached(gear, fingers, target):
+    return (gear is not None and abs(gear - target) < 0.002
+            and all(position is not None and abs(position - multiplier * target) < 0.0004
+                    for position, multiplier in zip(fingers, FINGER_MULTIPLIERS)))
 
 
 class SimGripper(Node):
@@ -20,6 +27,7 @@ class SimGripper(Node):
         super().__init__('sim_gripper_node')
         self.samples = threading.Condition()
         self.position = None
+        self.fingers = (None, None)
         self.state_received = 0.0
         self.service_group = MutuallyExclusiveCallbackGroup()
         self.command = self.create_publisher(Float64MultiArray, '/gripper_controller/commands', 10)
@@ -32,6 +40,10 @@ class SimGripper(Node):
             return
         with self.samples:
             self.position = message.position[message.name.index('gripper_joint')]
+            positions = dict(zip(message.name, message.position))
+            self.fingers = tuple(positions.get(f'{side}_finger_joint_mimic',
+                                               positions.get(f'{side}_finger_joint'))
+                                 for side in ('left', 'right'))
             self.state_received = time.monotonic()
             self.samples.notify_all()
 
@@ -49,8 +61,8 @@ class SimGripper(Node):
         self.command.publish(Float64MultiArray(data=[target]))
         with self.samples:
             while self.context.ok() and time.monotonic() < deadline:
-                if (self.state_received > start and self.position is not None
-                        and abs(self.position - target) < 0.002):
+                if (self.state_received > start
+                        and gripper_reached(self.position, self.fingers, target)):
                     response.success = True
                     break
                 self.samples.wait(0.05)

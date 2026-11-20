@@ -164,7 +164,8 @@
     <sensor name="mujoco_contact_blade_sensor" type="contact">
       <always_on>true</always_on>
       <update_rate>200</update_rate>
-      <contact><collision>mujoco_contact_blade</collision></contact>
+      <!-- SDFormat's URDF importer renames collisions when reducing fixed joints. -->
+      <contact><collision>left_finger_link_fixed_joint_lump__mujoco_contact_blade_collision_1</collision></contact>
       <plugin name="mujoco_contact_blade_ros" filename="libgazebo_ros_bumper.so">
         <ros><namespace>/sim/harvest</namespace>
              <remapping>bumper_states:=blade_contacts</remapping></ros>

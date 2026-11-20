@@ -50,6 +50,8 @@
         <robot_param_node>robot_state_publisher</robot_param_node>
         <parameters>$(find tomato_sim_description)/config/controllers.yaml</parameters>
       </plugin>
+      <plugin name="gripper_internal_contact_filter" filename="libtomato_sim_gripper_collision_filter.so"/>
+      <plugin name="slide_parking_brake" filename="libtomato_sim_slide_parking_brake.so"/>
     </gazebo>
   </xacro:macro>
 </robot>

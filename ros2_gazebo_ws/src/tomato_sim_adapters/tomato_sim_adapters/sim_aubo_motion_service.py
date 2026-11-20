@@ -17,15 +17,11 @@ from rclpy.qos import qos_profile_sensor_data
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Bool, UInt8
 from trajectory_msgs.msg import JointTrajectoryPoint
+from tf2_ros import Buffer, TransformException, TransformListener
 from xc_interfaces.msg import ArmStatus, MidpointReached
 from xc_interfaces.srv import MoveJoints, MoveToPose
 
 from .arm_kinematics import ArmKinematics, BOUND, JOINTS, OEM_HOME
-
-# OEM home is retained for /move_joints. This pose puts the calibrated TCP
-# 0.22 m above the crate at its standalone CAD location in Gazebo.
-GAZEBO_BOX = [-2.780845882, -0.237911009, 2.226407324, 2.839745193, 1.302518395, 0.609632166]
-
 
 def waypoints(request, gripper_length=0.0):
     xyz = np.array([request.x, request.y, request.z])
@@ -57,7 +53,10 @@ class SimArm(Node):
             self.declare_parameter('action_timeout_scale', 1.0).value)
         if self.action_timeout_scale < 1.0:
             raise ValueError('action_timeout_scale must be at least 1.0')
-        self.box = np.array(self.declare_parameter('box_joints_rad', GAZEBO_BOX).value)
+        box = self.declare_parameter('box_joints_rad', rclpy.Parameter.Type.DOUBLE_ARRAY).value
+        self.box = np.asarray(box) if box is not None else None
+        self.tf = Buffer()
+        self.tf_listener = TransformListener(self.tf, self)
         self.gripper_length = self.declare_parameter('request_gripper_length', 0.0).value
         if not math.isfinite(self.gripper_length) or self.gripper_length < 0.0:
             raise ValueError('request_gripper_length must be finite and nonnegative')
@@ -269,9 +268,17 @@ class SimArm(Node):
         try:
             if self.approach_q:
                 self.retreat()
-            self.execute([OEM_HOME, self.box])
+            target = self.box
+            if target is None:
+                transform = self.tf.lookup_transform(
+                    'arm_base_link', 'basket_link', rclpy.time.Time()).transform
+                p, q = transform.translation, transform.rotation
+                base_from_basket = kdl.Frame(
+                    kdl.Rotation.Quaternion(q.x, q.y, q.z, q.w), kdl.Vector(p.x, p.y, p.z))
+                target = self.kin.ik_basket(base_from_basket, OEM_HOME)
+            self.execute([OEM_HOME, target])
             self.midpoint_q = None
-        except (ValueError, RuntimeError) as error:
+        except (ValueError, RuntimeError, TransformException) as error:
             self.get_logger().warning(str(error))
             response.result = 30005
         return response

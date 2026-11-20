@@ -1,0 +1,1185 @@
+{
+  "date": "2026-11-20",
+  "wheel_baseline_commit": "4b8306b",
+  "acceptance_tag": "geometry-actuators-2026-11-20",
+  "world": {
+    "source_world": "/data/tomato_gazebo/gazebo_migration/tomato_corridor_v4.world",
+    "source_sha256": "90c63297014a3a6cff10929fced3fe2f33e3ab9e7faacaba2a6d790e86bef2c3",
+    "arm_base_yaw_deg": 180.0,
+    "runtime_world": "/data/tomato_gazebo/ros2_gazebo_ws/validation/runtime_worlds/tomato_corridor_v4_ros_160624.world",
+    "world_name": "tomato_corridor_v4",
+    "change": "gazebo_ros_state WorldPlugin only; map layout unchanged"
+  },
+  "configuration": {
+    "lift_height_m": 0,
+    "arm_base_yaw_deg": 180,
+    "camera_rate_hz": 3,
+    "side_depth_units_per_metre": 4000,
+    "hand_depth_units_per_metre": 1000
+  },
+  "criteria": {
+    "parking_max_displacement_mm": 0.5,
+    "sphere_center_error_mm": 3,
+    "tcp_command_error_mm": 3,
+    "tcp_sphere_surface_error_mm": 3,
+    "finger_residual_mm": 0.4,
+    "blade_ball_contact_required": true,
+    "world_target_compensation_enabled": false
+  },
+  "fixture": {
+    "sphere_radius_m": 0.004,
+    "contact_margin_m": 0.0005,
+    "ode_contact": {
+      "kp": 10000,
+      "kd": 1,
+      "max_vel": 0.01,
+      "min_depth": 1e-05
+    },
+    "optical_positions_m": {
+      "right": [
+        0.02,
+        -0.02,
+        0.35
+      ],
+      "left": [
+        -0.06,
+        -0.12,
+        0.42
+      ],
+      "hand": [
+        0,
+        0,
+        0.18
+      ]
+    }
+  },
+  "before_parking_fix": {
+    "sphere": {
+      "rms_surface_error_m": 0.0002281943137101287,
+      "pixel_center": [
+        458.3173076923077,
+        204.96153846153845
+      ],
+      "depth_samples": 104,
+      "image_stamp_ns": 425000000000,
+      "camera_frame": "cam_right_color_optical_frame",
+      "sphere_radius_m": 0.004,
+      "true_center_world_m": [
+        0.4903434233236438,
+        -0.39113006628460534,
+        1.236111
+      ],
+      "contact_approach_margin_m": 0.0005,
+      "measured_center_camera_m": [
+        0.01951330390567815,
+        -0.02064643799635703,
+        0.34999142362277574
+      ],
+      "measured_center_world_m": [
+        0.49089527781568293,
+        -0.39123948710415696,
+        1.2367574379963568
+      ],
+      "center_error_mm": 0.8569704658090856,
+      "target_touch_base_m": [
+        -0.2557694077329087,
+        0.38390163773341385,
+        0.46617264537037884
+      ],
+      "hand_eye_matrix": [
+        [
+          0.9702957262759966,
+          1.5265566588595902e-16,
+          0.24192189559966773,
+          -0.35834099999999997
+        ],
+        [
+          -0.24192189559966776,
+          -2.220446049250313e-16,
+          0.9702957262759965,
+          0.05236499999999999
+        ],
+        [
+          1.942890293094024e-16,
+          -1.0,
+          -1.1102230246251565e-16,
+          0.4457319999999999
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "actual_tcp_world_m": [
+        0.4820288247604436,
+        -0.38789819900682565,
+        1.2365457246953993
+      ],
+      "physical_tcp_world_m": [
+        0.4820142340299658,
+        -0.38790229684899485,
+        1.2365777727634597
+      ],
+      "tcp_command_error_mm": 9.899127187647544,
+      "tcp_sphere_surface_error_mm": 4.944929660544517,
+      "physical_tf_error_mm": 0.035450816531184225,
+      "world_target_compensation_enabled": false,
+      "target_reexpressions_after_midpoint": [],
+      "base_translation_during_touch_m": [
+        -0.009902529417980505,
+        0.0,
+        0.0
+      ],
+      "blade_ball_contact_detected": false,
+      "blade_ball_collision_pairs": []
+    },
+    "parking": {
+      "initial_slide_m": 0.23405900197416035,
+      "minimum_slide_m": 0.22367977889630364,
+      "maximum_slide_m": 0.23429585556958932,
+      "max_displacement_mm": 10.379223077856714,
+      "peak_to_peak_mm": 10.61607667328568,
+      "sample_count": 1415,
+      "world_target_compensation_enabled": false
+    }
+  },
+  "cameras": {
+    "right": {
+      "sphere": {
+        "rms_surface_error_m": 5.904347433622531e-05,
+        "pixel_center": [
+          458.13,
+          204.91
+        ],
+        "depth_samples": 100,
+        "image_stamp_ns": 125166000000,
+        "camera_frame": "cam_right_color_optical_frame",
+        "depth_units_per_metre": 4000,
+        "sphere_radius_m": 0.004,
+        "true_center_world_m": [
+          0.5562609486300142,
+          -0.39113006628460534,
+          1.236111
+        ],
+        "contact_approach_margin_m": 0.0005,
+        "measured_center_camera_m": [
+          0.019415017602562146,
+          -0.020552859113683236,
+          0.349978994931806
+        ],
+        "measured_center_world_m": [
+          0.5568336361367574,
+          -0.39125120520718704,
+          1.2366638591136832
+        ],
+        "center_error_mm": 0.8051700556569291,
+        "target_touch_base_m": [
+          -0.2558668692901731,
+          0.383913017281002,
+          0.4660799856221058
+        ],
+        "hand_eye_matrix": [
+          [
+            0.9702957262759966,
+            1.5265566588595902e-16,
+            0.24192189559966773,
+            -0.358341
+          ],
+          [
+            -0.24192189559966776,
+            -2.220446049250313e-16,
+            0.9702957262759965,
+            0.052364999999999995
+          ],
+          [
+            1.942890293094024e-16,
+            -1.0,
+            -1.1102230246251565e-16,
+            0.4457319999999999
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "actual_tcp_world_m": [
+          0.5578734326006256,
+          -0.3879124607636295,
+          1.236452949034435
+        ],
+        "physical_tcp_world_m": [
+          0.5578511163015428,
+          -0.38791799953148065,
+          1.2364931690219687
+        ],
+        "tcp_command_error_mm": 0.010066705467106056,
+        "tcp_sphere_surface_error_mm": 0.39555008198805147,
+        "physical_tf_error_mm": 0.04632863640642575,
+        "world_target_compensation_enabled": false,
+        "target_reexpressions_after_midpoint": [],
+        "base_translation_during_touch_m": [
+          -4.0028957926097064e-10,
+          0.0,
+          0.0
+        ],
+        "blade_ball_contact_detected": true,
+        "blade_ball_collision_pairs": [
+          [
+            "rgbd_calibration_sphere::ball::ball",
+            "tomato_picker::left_finger_link::left_finger_link_fixed_joint_lump__mujoco_contact_blade_collision_1"
+          ]
+        ]
+      },
+      "parking": {
+        "initial_slide_m": 0.2999985274719418,
+        "minimum_slide_m": 0.2999960876682201,
+        "maximum_slide_m": 0.3000012131096566,
+        "max_displacement_mm": 0.00268563771482766,
+        "peak_to_peak_mm": 0.005125441436493183,
+        "sample_count": 2341,
+        "world_target_compensation_enabled": false
+      }
+    },
+    "left": {
+      "sphere": {
+        "rms_surface_error_m": 6.150687187281111e-05,
+        "pixel_center": [
+          337.0,
+          66.5
+        ],
+        "depth_samples": 70,
+        "image_stamp_ns": 21498000000,
+        "camera_frame": "cam_left_color_optical_frame",
+        "depth_units_per_metre": 4000,
+        "sphere_radius_m": 0.004,
+        "true_center_world_m": [
+          0.5005145868566637,
+          0.42953889129993844,
+          1.336111
+        ],
+        "contact_approach_margin_m": 0.0005,
+        "measured_center_camera_m": [
+          -0.06070378384685755,
+          -0.12068151799409395,
+          0.42000046303170463
+        ],
+        "measured_center_world_m": [
+          0.499831596380343,
+          0.42936907985529843,
+          1.336792517994094
+        ],
+        "center_error_mm": 0.979682955730784,
+        "target_touch_base_m": [
+          -0.19910639120320123,
+          -0.43025265807088015,
+          0.5654561424911476
+        ],
+        "hand_eye_matrix": [
+          [
+            -0.9702957262759964,
+            4.163336342344337e-17,
+            0.24192189559966804,
+            -0.358341
+          ],
+          [
+            -0.24192189559966804,
+            -3.426078865054194e-16,
+            -0.9702957262759964,
+            -0.040530000000000004
+          ],
+          [
+            4.163336342344337e-17,
+            -1.0,
+            3.235259282696745e-16,
+            0.4457319999999999
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "actual_tcp_world_m": [
+          0.5011003020208287,
+          0.42625259360823403,
+          1.3358298239146644
+        ],
+        "physical_tcp_world_m": [
+          0.5011096616443714,
+          0.4262545811754772,
+          1.3358593849930462
+        ],
+        "tcp_command_error_mm": 0.0070424939185140985,
+        "tcp_sphere_surface_error_mm": 0.6527448396741118,
+        "physical_tf_error_mm": 0.03107105295132408,
+        "world_target_compensation_enabled": false,
+        "target_reexpressions_after_midpoint": [],
+        "base_translation_during_touch_m": [
+          4.689215793440837e-09,
+          0.0,
+          0.0
+        ],
+        "blade_ball_contact_detected": true,
+        "blade_ball_collision_pairs": [
+          [
+            "rgbd_calibration_sphere::ball::ball",
+            "tomato_picker::left_finger_link::left_finger_link_fixed_joint_lump__mujoco_contact_blade_collision_1"
+          ]
+        ]
+      },
+      "parking": {
+        "initial_slide_m": 0.29999852657554626,
+        "minimum_slide_m": 0.2999985265440872,
+        "maximum_slide_m": 0.29999853288535566,
+        "max_displacement_mm": 6.309809397198052e-06,
+        "peak_to_peak_mm": 6.341268454779225e-06,
+        "sample_count": 1038,
+        "world_target_compensation_enabled": false
+      }
+    },
+    "hand": {
+      "sphere": {
+        "rms_surface_error_m": 0.00022362591812420917,
+        "pixel_center": [
+          423.4212962962963,
+          239.3101851851852
+        ],
+        "depth_samples": 216,
+        "image_stamp_ns": 59165000000,
+        "camera_frame": "cam_hand_color_optical_frame",
+        "depth_units_per_metre": 1000,
+        "sphere_radius_m": 0.004,
+        "true_center_world_m": [
+          -0.2405577649485049,
+          0.0399566354783077,
+          1.3053045397874106
+        ],
+        "contact_approach_margin_m": 0.0005,
+        "measured_center_camera_m": [
+          -0.0004222070248771711,
+          -0.0003807351001766282,
+          0.17992737484026314
+        ],
+        "measured_center_world_m": [
+          -0.24044524738846906,
+          0.03954437709696485,
+          1.3056864759439955
+        ],
+        "center_error_mm": 0.5731425669156648,
+        "target_touch_base_m": [
+          0.5389716972471936,
+          -0.04397591095197028,
+          0.5353994633949639
+        ],
+        "hand_eye_matrix": [
+          [
+            0.12105176315640856,
+            -0.027982140966737568,
+            0.9922517172691829,
+            0.363950982432886
+          ],
+          [
+            -0.9926447837231198,
+            -0.005098621571447359,
+            0.1209559316666699,
+            -0.06572870317819736
+          ],
+          [
+            0.0016745100793145173,
+            -0.9995954200800385,
+            -0.028393523398928033,
+            0.5400363739991485
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "actual_tcp_world_m": [
+          -0.23696710812160904,
+          0.039972355117794164,
+          1.3057756118952528
+        ],
+        "physical_tcp_world_m": [
+          -0.2369868333206055,
+          0.03998335500659572,
+          1.3057943240837129
+        ],
+        "tcp_command_error_mm": 0.007584808655122805,
+        "tcp_sphere_surface_error_mm": 0.3955367554615663,
+        "physical_tf_error_mm": 0.029329627104024668,
+        "world_target_compensation_enabled": false,
+        "target_reexpressions_after_midpoint": [],
+        "base_translation_during_touch_m": [
+          8.601281908937608e-10,
+          0.0,
+          0.0
+        ],
+        "blade_ball_contact_detected": true,
+        "blade_ball_collision_pairs": [
+          [
+            "rgbd_calibration_sphere::ball::ball",
+            "tomato_picker::left_finger_link::left_finger_link_fixed_joint_lump__mujoco_contact_blade_collision_1"
+          ]
+        ]
+      },
+      "parking": {
+        "initial_slide_m": 0.29999853128314163,
+        "minimum_slide_m": 0.2999984891813538,
+        "maximum_slide_m": 0.30000252677636685,
+        "max_displacement_mm": 0.003995493225217306,
+        "peak_to_peak_mm": 0.004037595013051121,
+        "sample_count": 1856,
+        "world_target_compensation_enabled": false
+      }
+    }
+  },
+  "right_1000_units": {
+    "sphere": {
+      "rms_surface_error_m": 0.00023202243568781265,
+      "pixel_center": [
+        458.13,
+        204.91
+      ],
+      "depth_samples": 100,
+      "image_stamp_ns": 128323000000,
+      "camera_frame": "cam_right_color_optical_frame",
+      "sphere_radius_m": 0.004,
+      "true_center_world_m": [
+        0.556260948631253,
+        -0.39113006628460534,
+        1.236111
+      ],
+      "contact_approach_margin_m": 0.0005,
+      "measured_center_camera_m": [
+        0.019470190972896314,
+        -0.020632668906434774,
+        0.34997964538202314
+      ],
+      "measured_center_world_m": [
+        0.5567799442946697,
+        -0.39123848868991506,
+        1.2367436689064346
+      ],
+      "center_error_mm": 0.8254585766637477,
+      "target_touch_base_m": [
+        -0.2558136880047989,
+        0.3839005072288768,
+        0.46615900477168676
+      ],
+      "hand_eye_matrix": [
+        [
+          0.9702957262759966,
+          1.5265566588595902e-16,
+          0.24192189559966773,
+          -0.358341
+        ],
+        [
+          -0.24192189559966776,
+          -2.220446049250313e-16,
+          0.9702957262759965,
+          0.052364999999999995
+        ],
+        [
+          1.942890293094024e-16,
+          -1.0,
+          -1.1102230246251565e-16,
+          0.4457319999999999
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "actual_tcp_world_m": [
+        0.5578201908447693,
+        -0.3878999776616136,
+        1.2365319686182599
+      ],
+      "physical_tcp_world_m": [
+        0.5577978627064906,
+        -0.3879055069824374,
+        1.2365722019693448
+      ],
+      "tcp_command_error_mm": 0.010016771610968905,
+      "tcp_sphere_surface_error_mm": 0.39825114362638514,
+      "physical_tf_error_mm": 0.04634481294914375,
+      "world_target_compensation_enabled": false,
+      "target_reexpressions_after_midpoint": [],
+      "base_translation_during_touch_m": [
+        -4.001564635203181e-10,
+        0.0,
+        0.0
+      ],
+      "blade_ball_contact_detected": true,
+      "blade_ball_collision_pairs": [
+        [
+          "rgbd_calibration_sphere::ball::ball",
+          "tomato_picker::left_finger_link::left_finger_link_fixed_joint_lump__mujoco_contact_blade_collision_1"
+        ]
+      ]
+    },
+    "parking": {
+      "initial_slide_m": 0.2999985262067515,
+      "minimum_slide_m": 0.2999968654336435,
+      "maximum_slide_m": 0.3000012684547561,
+      "max_displacement_mm": 0.002742248004616865,
+      "peak_to_peak_mm": 0.004403021112597827,
+      "sample_count": 2253,
+      "world_target_compensation_enabled": false
+    }
+  },
+  "basket": {
+    "return_service_result": 0,
+    "basket": {
+      "joints_rad": [
+        0.36074773641336844,
+        -0.2379000447059907,
+        2.226425945496206,
+        2.8397453731120876,
+        1.3025324210727733,
+        0.6096311451782626
+      ],
+      "tcp_in_basket_m": [
+        5.323035189852554e-06,
+        1.7810138235544587e-06,
+        -0.21999730134693962
+      ],
+      "arm_base_in_basket_m": [
+        0.535,
+        -0.006,
+        0.17600000000000005
+      ],
+      "arm_base_rpy_in_basket_rad": [
+        3.141592653589793,
+        0.0,
+        3.141592653589793
+      ],
+      "tcp_in_arm_base_m": [
+        0.5349946769650689,
+        0.006001781013178655,
+        0.39599730134638583
+      ],
+      "tcp_rpy_in_arm_base_rad": [
+        2.094392004960296,
+        -0.7854076725393558,
+        -1.8849400730425505
+      ],
+      "release_target_in_basket_m": [
+        0,
+        0,
+        -0.22
+      ],
+      "tcp_rpy_in_basket_rad": [
+        -1.0472006486218448,
+        0.7854076725349639,
+        -1.25665258055103
+      ],
+      "target_error_mm": 0.006228117067974356,
+      "fk_tf_error_mm": 8.8848110740847e-10,
+      "centered_35mm_fruit_edge_clearance_m": [
+        0.11499467696481014,
+        0.16999821898617642
+      ],
+      "tcp_above_basket_opening": true
+    },
+    "parking": {
+      "initial_slide_m": 0.299998526217182,
+      "minimum_slide_m": 0.29999714629679686,
+      "maximum_slide_m": 0.30000195032845556,
+      "max_displacement_mm": 0.0034241112735755586,
+      "peak_to_peak_mm": 0.0048040316587005805,
+      "sample_count": 1244,
+      "world_target_compensation_enabled": false
+    }
+  },
+  "gripper": {
+    "gripper": [
+      {
+        "cycle": 0,
+        "command": "close",
+        "service_success": true,
+        "gear_rad": 0.3999999962082752,
+        "fingers_m": [
+          -0.008400836796764252,
+          -0.008396716838481637
+        ],
+        "target_residual_mm": [
+          -0.0012367967642517436,
+          0.0012831615183641482
+        ],
+        "mimic_residual_mm": [
+          -0.0012368763866801857,
+          0.0012830819111006586
+        ]
+      },
+      {
+        "cycle": 0,
+        "command": "open",
+        "service_success": true,
+        "gear_rad": -0.4500000037476516,
+        "fingers_m": [
+          0.009448319415930372,
+          0.009449026698406835
+        ],
+        "target_residual_mm": [
+          -0.001230584069629101,
+          0.0012766984068355441
+        ],
+        "mimic_residual_mm": [
+          -0.0012306627665634867,
+          0.001276619724890904
+        ]
+      },
+      {
+        "cycle": 1,
+        "command": "close",
+        "service_success": true,
+        "gear_rad": 0.3999999962082761,
+        "fingers_m": [
+          -0.008400836796994306,
+          -0.008396716838350382
+        ],
+        "target_residual_mm": [
+          -0.0012367969943055668,
+          0.0012831616496185305
+        ],
+        "mimic_residual_mm": [
+          -0.0012368766167166617,
+          0.001283082042374123
+        ]
+      },
+      {
+        "cycle": 1,
+        "command": "open",
+        "service_success": true,
+        "gear_rad": -0.4500000037476508,
+        "fingers_m": [
+          0.009448319415701947,
+          0.009449026698538334
+        ],
+        "target_residual_mm": [
+          -0.0012305842980540188,
+          0.0012766985383345225
+        ],
+        "mimic_residual_mm": [
+          -0.001230662994972792,
+          0.0012766198564054948
+        ]
+      },
+      {
+        "cycle": 2,
+        "command": "close",
+        "service_success": true,
+        "gear_rad": 0.399999996208277,
+        "fingers_m": [
+          -0.008400836797226823,
+          -0.008396716838217314
+        ],
+        "target_residual_mm": [
+          -0.0012367972268226973,
+          0.0012831617826874336
+        ],
+        "mimic_residual_mm": [
+          -0.0012368768492147103,
+          0.001283082175462108
+        ]
+      },
+      {
+        "cycle": 2,
+        "command": "open",
+        "service_success": true,
+        "gear_rad": -0.45000000374765065,
+        "fingers_m": [
+          0.009448319415471052,
+          0.009449026698671715
+        ],
+        "target_residual_mm": [
+          -0.001230584528949183,
+          0.0012766986717156759
+        ],
+        "mimic_residual_mm": [
+          -0.0012306632258644867,
+          0.0012766199897901176
+        ]
+      },
+      {
+        "cycle": 3,
+        "command": "close",
+        "service_success": true,
+        "gear_rad": 0.39999999620827786,
+        "fingers_m": [
+          -0.008400836797461904,
+          -0.00839671683808223
+        ],
+        "target_residual_mm": [
+          -0.0012367974619037492,
+          0.0012831619177703507
+        ],
+        "mimic_residual_mm": [
+          -0.0012368770842766802,
+          0.0012830823105623723
+        ]
+      },
+      {
+        "cycle": 3,
+        "command": "open",
+        "service_success": true,
+        "gear_rad": -0.45000000374765114,
+        "fingers_m": [
+          0.009448319415237588,
+          0.009449026698807095
+        ],
+        "target_residual_mm": [
+          -0.0012305847624134725,
+          0.0012766988070952306
+        ],
+        "mimic_residual_mm": [
+          -0.0012306634593391846,
+          0.001276620125159264
+        ]
+      },
+      {
+        "cycle": 4,
+        "command": "close",
+        "service_success": true,
+        "gear_rad": 0.39999999620827786,
+        "fingers_m": [
+          -0.008400836797699531,
+          -0.0083967168379452
+        ],
+        "target_residual_mm": [
+          -0.001236797699531375,
+          0.0012831620548013623
+        ],
+        "mimic_residual_mm": [
+          -0.001236877321904306,
+          0.0012830824475933839
+        ]
+      },
+      {
+        "cycle": 4,
+        "command": "open",
+        "service_success": true,
+        "gear_rad": -0.4500000037476487,
+        "fingers_m": [
+          0.009448319415001731,
+          0.009449026698944292
+        ],
+        "target_residual_mm": [
+          -0.0012305849982699457,
+          0.0012766989442927756
+        ],
+        "mimic_residual_mm": [
+          -0.0012306636951436162,
+          0.001276620262407116
+        ]
+      },
+      {
+        "cycle": 5,
+        "command": "close",
+        "service_success": true,
+        "gear_rad": 0.39999999620827786,
+        "fingers_m": [
+          -0.008400836797939628,
+          -0.00839671683780632
+        ],
+        "target_residual_mm": [
+          -0.0012367979396275125,
+          0.001283162193681589
+        ],
+        "mimic_residual_mm": [
+          -0.0012368775620004435,
+          0.0012830825864736106
+        ]
+      },
+      {
+        "cycle": 5,
+        "command": "open",
+        "service_success": true,
+        "gear_rad": -0.45000000374764915,
+        "fingers_m": [
+          0.009448319414763295,
+          0.009449026699083441
+        ],
+        "target_residual_mm": [
+          -0.0012305852367059528,
+          0.0012766990834418845
+        ],
+        "mimic_residual_mm": [
+          -0.0012306639335900316,
+          0.0012766204015475513
+        ]
+      },
+      {
+        "cycle": 6,
+        "command": "close",
+        "service_success": true,
+        "gear_rad": 0.39999999620827786,
+        "fingers_m": [
+          -0.008400836798182232,
+          -0.008396716837665493
+        ],
+        "target_residual_mm": [
+          -0.00123679818223206,
+          0.0012831623345081755
+        ],
+        "mimic_residual_mm": [
+          -0.001236877804604991,
+          0.0012830827273001971
+        ]
+      },
+      {
+        "cycle": 6,
+        "command": "open",
+        "service_success": true,
+        "gear_rad": -0.45000000374764737,
+        "fingers_m": [
+          0.009448319414522436,
+          0.009449026699224502
+        ],
+        "target_residual_mm": [
+          -0.0012305854775653685,
+          0.0012766992245026587
+        ],
+        "mimic_residual_mm": [
+          -0.0012306641744112834,
+          0.0012766205426464894
+        ]
+      },
+      {
+        "cycle": 7,
+        "command": "close",
+        "service_success": true,
+        "gear_rad": 0.39999999620827875,
+        "fingers_m": [
+          -0.0084008367984273,
+          -0.008396716837522756
+        ],
+        "target_residual_mm": [
+          -0.001236798427299915,
+          0.0012831624772446926
+        ],
+        "mimic_residual_mm": [
+          -0.001236878049653764,
+          0.0012830828700557961
+        ]
+      },
+      {
+        "cycle": 7,
+        "command": "open",
+        "service_success": true,
+        "gear_rad": -0.4500000037476468,
+        "fingers_m": [
+          0.009448319414279115,
+          0.009449026699367459
+        ],
+        "target_residual_mm": [
+          -0.0012305857208863569,
+          0.0012766993674594856
+        ],
+        "mimic_residual_mm": [
+          -0.0012306644177201287,
+          0.0012766206856137247
+        ]
+      },
+      {
+        "cycle": 8,
+        "command": "close",
+        "service_success": true,
+        "gear_rad": 0.39999999620827964,
+        "fingers_m": [
+          -0.008400836798674925,
+          -0.008396716837378087
+        ],
+        "target_residual_mm": [
+          -0.0012367986749247523,
+          0.0012831626219136916
+        ],
+        "mimic_residual_mm": [
+          -0.001236878297261254,
+          0.001283083014743877
+        ]
+      },
+      {
+        "cycle": 8,
+        "command": "open",
+        "service_success": true,
+        "gear_rad": -0.45000000374764626,
+        "fingers_m": [
+          0.009448319414033299,
+          0.009449026699512336
+        ],
+        "target_residual_mm": [
+          -0.0012305859667018776,
+          0.0012766995123366515
+        ],
+        "mimic_residual_mm": [
+          -0.001230664663525241,
+          0.0012766208305030335
+        ]
+      },
+      {
+        "cycle": 9,
+        "command": "close",
+        "service_success": true,
+        "gear_rad": 0.3999999962082814,
+        "fingers_m": [
+          -0.008400836798924996,
+          -0.008396716837231494
+        ],
+        "target_residual_mm": [
+          -0.0012367989249955497,
+          0.001283162768506499
+        ],
+        "mimic_residual_mm": [
+          -0.0012368785472938876,
+          0.0012830831613731136
+        ]
+      },
+      {
+        "cycle": 9,
+        "command": "open",
+        "service_success": true,
+        "gear_rad": -0.45000000374764754,
+        "fingers_m": [
+          0.009448319413785084,
+          0.009449026699659031
+        ],
+        "target_residual_mm": [
+          -0.0012305862149165209,
+          0.0012766996590318075
+        ],
+        "mimic_residual_mm": [
+          -0.0012306649117659052,
+          0.0012766209771721687
+        ]
+      }
+    ]
+  },
+  "rail": {
+    "rail": [
+      {
+        "command_mm_s": 100,
+        "duration_sim_s": 2.0,
+        "displacement_m": 0.20009988731520234,
+        "measured_speed_mm_s": 100.04994365760118,
+        "parking_after_stop": {
+          "initial_slide_m": 0.501197130575808,
+          "minimum_slide_m": 0.5011971280334053,
+          "maximum_slide_m": 0.5011971305758538,
+          "max_displacement_mm": 2.5424026217635287e-06,
+          "peak_to_peak_mm": 2.5424484739744457e-06,
+          "sample_count": 431,
+          "world_target_compensation_enabled": false
+        }
+      },
+      {
+        "command_mm_s": -100,
+        "duration_sim_s": 2.0,
+        "displacement_m": -0.19978795662262977,
+        "measured_speed_mm_s": -99.89397831131488,
+        "parking_after_stop": {
+          "initial_slide_m": 0.27235344186004695,
+          "minimum_slide_m": 0.2723534418597282,
+          "maximum_slide_m": 0.2723534418814167,
+          "max_displacement_mm": 2.1369739311438707e-08,
+          "peak_to_peak_mm": 2.168848434180859e-08,
+          "sample_count": 301,
+          "world_target_compensation_enabled": false
+        }
+      }
+    ],
+    "parking": {
+      "initial_slide_m": 0.27235344186004695,
+      "minimum_slide_m": 0.2723534418597282,
+      "maximum_slide_m": 0.2723534418814167,
+      "max_displacement_mm": 2.1369739311438707e-08,
+      "peak_to_peak_mm": 2.168848434180859e-08,
+      "sample_count": 301,
+      "world_target_compensation_enabled": false
+    }
+  },
+  "rail_after_reset_world": {
+    "rail": [
+      {
+        "command_mm_s": 100,
+        "duration_sim_s": 2.0,
+        "displacement_m": 0.20008316920385827,
+        "measured_speed_mm_s": 100.04158460192913,
+        "parking_after_stop": {
+          "initial_slide_m": 0.47752831472340823,
+          "minimum_slide_m": 0.4775283147211663,
+          "maximum_slide_m": 0.47752831474343604,
+          "max_displacement_mm": 2.002781274157428e-08,
+          "peak_to_peak_mm": 2.226974160635109e-08,
+          "sample_count": 301,
+          "world_target_compensation_enabled": false
+        }
+      },
+      {
+        "command_mm_s": -100,
+        "duration_sim_s": 2.0,
+        "displacement_m": -0.1997946124894812,
+        "measured_speed_mm_s": -99.89730624474059,
+        "parking_after_stop": {
+          "initial_slide_m": 0.24867405177429378,
+          "minimum_slide_m": 0.24867405177407748,
+          "maximum_slide_m": 0.2486740517957278,
+          "max_displacement_mm": 2.1434021224564503e-08,
+          "peak_to_peak_mm": 2.16503204253371e-08,
+          "sample_count": 301,
+          "world_target_compensation_enabled": false
+        }
+      }
+    ],
+    "parking": {
+      "initial_slide_m": 0.24867405177429378,
+      "minimum_slide_m": 0.24867405177407748,
+      "maximum_slide_m": 0.2486740517957278,
+      "max_displacement_mm": 2.1434021224564503e-08,
+      "peak_to_peak_mm": 2.16503204253371e-08,
+      "sample_count": 301,
+      "world_target_compensation_enabled": false
+    }
+  },
+  "parking_after_gazebo_transport_reset": {
+    "parking": {
+      "initial_slide_m": 0.2486757116981552,
+      "minimum_slide_m": 0.24867571169549965,
+      "maximum_slide_m": 0.2486757117195107,
+      "max_displacement_mm": 2.135550070114789e-08,
+      "peak_to_peak_mm": 2.40110431537488e-08,
+      "sample_count": 302,
+      "world_target_compensation_enabled": false
+    }
+  },
+  "left_original_fixture_failure": {
+    "sphere": {
+      "rms_surface_error_m": 0.00023357705436239388,
+      "pixel_center": [
+        458.2959183673469,
+        204.89795918367346
+      ],
+      "depth_samples": 98,
+      "image_stamp_ns": 180991000000,
+      "camera_frame": "cam_left_color_optical_frame",
+      "sphere_radius_m": 0.004,
+      "true_center_world_m": [
+        0.5950727777101847,
+        0.38097194210859214,
+        1.236111
+      ],
+      "contact_approach_margin_m": 0.0005,
+      "measured_center_camera_m": [
+        0.019446127720943552,
+        -0.020638644062960565,
+        0.34997827219420374
+      ],
+      "measured_center_world_m": [
+        0.5945406142376888,
+        0.38081686587981733,
+        1.2367496440629606
+      ],
+      "center_error_mm": 0.845643445752921,
+      "target_touch_base_m": [
+        -0.2931979681795136,
+        -0.3813850299498602,
+        0.4661649189910504
+      ],
+      "hand_eye_matrix": [
+        [
+          -0.9702957262759964,
+          4.163336342344337e-17,
+          0.24192189559966804,
+          -0.358341
+        ],
+        [
+          -0.24192189559966804,
+          -3.426078865054194e-16,
+          -0.9702957262759964,
+          -0.040530000000000004
+        ],
+        [
+          4.163336342344337e-17,
+          -1.0,
+          3.235259282696745e-16,
+          0.4457319999999999
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    "parking": {
+      "initial_slide_m": 0.29999852623408113,
+      "minimum_slide_m": 0.298707187636284,
+      "maximum_slide_m": 0.30259586842628106,
+      "max_displacement_mm": 2.597342192199925,
+      "peak_to_peak_mm": 3.8886807899970455,
+      "sample_count": 4417,
+      "world_target_compensation_enabled": false
+    },
+    "result": 30003,
+    "optical_position_m": [
+      0.02,
+      -0.02,
+      0.35
+    ],
+    "collision_counts": {
+      "foreArm_Link_vs_lift_deck": 2664,
+      "upperArm_Link_vs_lift_deck": 2027
+    }
+  },
+  "verification": {
+    "unit_tests": {
+      "passed": 10,
+      "failed": 0,
+      "log": "test_release_target_tracks_basket_at_both_lift_heights (test_basket_target.BasketTargetTest) ... ok\ntest_sensor_references_an_existing_sdf_collision (test_blade_contact_sensor.BladeContactSensorTest) ... ok\ntest_default_weights_live_in_the_standalone_project (test_configuration.ConfigurationTest) ... ok\ntest_missing_external_weight_is_rejected_before_build (test_configuration.ConfigurationTest) ... ok\ntest_world_name_is_read_from_sdf (test_configuration.ConfigurationTest) ... ok\ntest_accepts_aligned_closed_fingers (test_gripper_completion.GripperCompletionTest) ... ok\ntest_rejects_gear_only_arrival_with_blocked_fingers (test_gripper_completion.GripperCompletionTest) ... ok\ntest_rejects_missing_finger_feedback (test_gripper_completion.GripperCompletionTest) ... ok\ntest_reconstructs_sphere_from_quantized_depth (test_rgbd_sphere.SphereMeasurementTest) ... ok\ntest_rejects_missing_sphere (test_rgbd_sphere.SphereMeasurementTest) ... ok\n\n----------------------------------------------------------------------\nRan 10 tests in 0.429s\n\nOK\n"
+    },
+    "build_packages": 9,
+    "controllers": [
+      "joint_state_broadcaster joint_state_broadcaster/JointStateBroadcaster active",
+      "slide_velocity_controller velocity_controllers/JointGroupVelocityController active",
+      "drive_wheel_velocity_controller velocity_controllers/JointGroupVelocityController active",
+      "arm_trajectory_controller joint_trajectory_controller/JointTrajectoryController active",
+      "gripper_controller position_controllers/JointGroupPositionController active"
+    ],
+    "structure": "Checked 34 installed mesh references, fixed rail, three RGB-D sensors, 0/14 degree mount, 0.2 m lift offset and ten wheel joints.",
+    "independent_review": "Two P2 findings fixed: reset state and depth scale. CAD regeneration matched 26 macros and 19 STL files."
+  },
+  "robot_source_reference_checks": {
+    "src/xc_robot_main_control/launch/robot_launch.py": true,
+    "src/xc_robot_main_control/xc_robot_main_control/xc_robot_main_control_node.py": true,
+    "src/xc_robot_main_control/xc_robot_main_control/yolov8_service.py": true
+  },
+  "known_limitations": [
+    "Selected single visible reachable fixture per camera at zero lift.",
+    "The original left-camera fixture still produces an IK trajectory colliding with the lift deck.",
+    "One early three-camera gzserver startup segfaulted; successful retries and the later normal startup were retained.",
+    "The ROS reset_world request ran but its DDS response timed out. Subsequent movement and parking passed; a Gazebo transport reset also passed."
+  ],
+  "simulation_code_sha256": {
+    "scripts/geometry_actuator_checks.py": "6a7b4b6f4184a3464dad747da69817fb20feed34bb3def0787023b817361908e",
+    "scripts/rgbd_sphere.py": "140c7bd79a8b91eafaf45c200b3de4b78bf65e78fd6e69a648cbdee1cf27566a",
+    "src/tomato_sim_gazebo/src/slide_parking_brake.cpp": "3f7f7911f5820ab00bd971a4ae08efd3669392bd1bef1581a8a40da94b8bf31b",
+    "src/tomato_sim_gazebo/src/gripper_collision_filter.cpp": "450e46ea6afbc06d8d4931810357c9cb78781e526b15a0a4f1b2212a19804f15",
+    "src/tomato_sim_adapters/tomato_sim_adapters/arm_kinematics.py": "c6d581cbfd629c0416ec0590b5b158df3127acc7a278e77678cc2dcce7cd9cec",
+    "src/tomato_sim_adapters/tomato_sim_adapters/sim_aubo_motion_service.py": "e3d2205fbe741e8fa51cdddac7928b949fddeb03c75ed18896cf42ac3f2d6dfc",
+    "src/tomato_sim_adapters/tomato_sim_adapters/sim_gripper_node.py": "8f234450ab687c27823905442d94a7d1cb9b9fa7728b4132b23781dba370da4b",
+    "src/tomato_sim_description/urdf/tomato_control.xacro": "8af0b798e1ccebec59e8978c3f4399652e6248f9b6c15de221b0146a9fe85b03",
+    "src/tomato_sim_description/urdf/tomato_picker_full.urdf.xacro": "6f563091784551def825207e3d5e17b5a96969dd11341ad4898104c6d3723867"
+  }
+}
