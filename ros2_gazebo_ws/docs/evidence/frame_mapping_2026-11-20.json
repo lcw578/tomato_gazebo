@@ -1,0 +1,364 @@
+{
+  "source": "8 live joint poses, 8 live SDK Cartesian commands, fitted CAD blade plane and saved same-exposure vision",
+  "initial_posture_q_deg": [
+    10.32,
+    15.369999999999997,
+    134.05,
+    117.05,
+    86.63,
+    0.0
+  ],
+  "live_joint_poses": 8,
+  "live_wrist_tf_max_position_error_mm": 0.107690498435336,
+  "live_wrist_tf_max_rotation_error_deg": 0.005640543969036226,
+  "wrist_to_flange_cad_mm": [
+    2.7755575615628914e-14,
+    4.440892098500626e-13,
+    50.95199999999978
+  ],
+  "wrist_to_tcp_cad_mm": [
+    -4.399999999107375,
+    -4.900000000022331,
+    135.9520000000447
+  ],
+  "controller_implied_flange_to_cut_mm": [
+    1.6653345369377345e-14,
+    -1.3877787807814454e-14,
+    99.99999999999994
+  ],
+  "position_error_decomposition": {
+    "cad_tcp_minus_controller_assumed_tcp_base_mm": [
+      6.109382472199582,
+      35.95200000004473,
+      2.4587488283158154
+    ],
+    "vision_minus_truth_base_mm": [
+      -3.477209299305839,
+      -1.7973546078952074,
+      0.17964797449365744
+    ],
+    "total_cad_tcp_minus_truth_base_mm": [
+      2.6321731728937356,
+      34.15464539214952,
+      2.638396802809473
+    ]
+  },
+  "total_tcp_to_truth_error_mm": 34.357375848057096,
+  "cad_blade_plane": {
+    "normal_cutter": [
+      0.9999998490592696,
+      1.427799025371588e-07,
+      0.0005494373645276129
+    ],
+    "normal_sdk_flange": [
+      1.427747935666539e-07,
+      0.9999998490592701,
+      -0.0005494373645276142
+    ],
+    "thickness_mm": 0.20000076393050184,
+    "fitted_center_cutter_mm": [
+      -4.879664935514925,
+      1.131904460679105,
+      -71.76338724312693
+    ],
+    "normal_world_target": [
+      0.9396925277798734,
+      0.0005494373645274919,
+      0.34201995753647857
+    ],
+    "stem_axis_world": [
+      4.0446028776995366e-10,
+      0.9967294838685189,
+      0.08081049428877264
+    ],
+    "normal_to_stem_angle_deg": 88.38482187996132,
+    "stem_to_blade_plane_angle_deg": 1.615178120038678
+  },
+  "initial_blade_tilt_from_horizontal_deg": 1.5985755552353218,
+  "initial_camera_height_above_tcp_mm": 114.04356418361417,
+  "world_from_sdk_from_exposure": [
+    [
+      -1.0,
+      -1.1102230246251565e-16,
+      -2.465190328815662e-32,
+      1.2519915432737034
+    ],
+    [
+      2.7755575615628914e-16,
+      -0.9999999999999998,
+      9.860761315262648e-32,
+      -0.003999999999999698
+    ],
+    [
+      -5.883285683441253e-17,
+      -9.415225223423922e-17,
+      0.9999999999999998,
+      1.6438789999999999
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "initial_model_frames": {
+    "arm_base_link": [
+      [
+        -1.0,
+        1.2246467991473532e-16,
+        1.4997597826618576e-32,
+        1.2519915432737878
+      ],
+      [
+        -1.2246467991473532e-16,
+        -1.0,
+        0.0,
+        -0.00399999999999981
+      ],
+      [
+        1.4997597826618576e-32,
+        0.0,
+        1.0,
+        1.6203789999999998
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "wrist3_Link": [
+      [
+        0.12102653872530789,
+        -0.027984861867191395,
+        -0.9922547175148355,
+        0.9159429198152585
+      ],
+      [
+        -0.9926478635413596,
+        -0.0050958031543206685,
+        -0.12093077274617481,
+        0.06392283666664571
+      ],
+      [
+        -0.00167210374860723,
+        0.9995953582807828,
+        -0.02839584076176046,
+        2.0551270168051756
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "flange_link": [
+      [
+        0.12102653872530789,
+        -0.027984861867191395,
+        -0.9922547175148355,
+        0.8653855574484427
+      ],
+      [
+        -0.9926478635413596,
+        -0.0050958031543206685,
+        -0.12093077274617481,
+        0.05776117193368261
+      ],
+      [
+        -0.00167210374860723,
+        0.9995953582807828,
+        -0.02839584076176046,
+        2.0536801919266825
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "cutter_base_link": [
+      [
+        -0.027984861867809043,
+        0.12102653873529287,
+        0.9922547175136002,
+        0.8653855574484427
+      ],
+      [
+        -0.0050958031492548276,
+        -0.9926478635401514,
+        0.12093077275630659,
+        0.05776117193368261
+      ],
+      [
+        0.9995953582807916,
+        -0.0016721037432161018,
+        0.028395840761777525,
+        2.0536801919266825
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "tool_tcp": [
+      [
+        -0.027984861867809043,
+        0.12102653873529287,
+        0.9922547175136002,
+        0.7806485155125037
+      ],
+      [
+        -0.0050958031492548276,
+        -0.9926478635401514,
+        0.12093077275630659,
+        0.051874676284404564
+      ],
+      [
+        0.9995953582807916,
+        -0.0016721037432161018,
+        0.028395840761777525,
+        2.0463758854628256
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "cam_hand_link": [
+      [
+        -0.9922543494134368,
+        0.12103231004033778,
+        -0.02797295115672385,
+        0.8880351930435476
+      ],
+      [
+        -0.12093644568797067,
+        -0.992647150598944,
+        -0.005100050211332157,
+        0.061729072366433206
+      ],
+      [
+        -0.02838454111796448,
+        -0.001677597716123844,
+        0.9995956700043401,
+        2.1604194496464397
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  },
+  "target_world_points": {
+    "truth_cut": [
+      1.19990725232334,
+      -0.7130195195580309,
+      2.0754807577731516
+    ],
+    "vision_cut": [
+      1.203384461622646,
+      -0.7112221649501357,
+      2.075660405747645
+    ],
+    "requested_sdk_flange": [
+      1.203384461622646,
+      -0.6112221649501357,
+      2.075660405747645
+    ],
+    "actual_cad_tcp": [
+      1.1972750791504463,
+      -0.7471741649501804,
+      2.078119154575961
+    ]
+  },
+  "target_pose_mode": "offline requested endpoint, live target harvest movement not executed",
+  "arbiter_reference_crossing_deg": 88.41621073505549,
+  "physical_mesh_normal_vs_cutter_x_max_error_deg": 0.003994037162143695,
+  "live_cartesian": {
+    "samples": 8,
+    "all_results_zero": true,
+    "max_position_error_mm": 0.043815140102714804,
+    "max_rotation_error_deg": 0.007891784669195403,
+    "world_from_sdk_fitted": [
+      [
+        -0.9999999968006359,
+        -6.981225877460429e-05,
+        -3.905095348418292e-05,
+        1.2519494854790991
+      ],
+      [
+        6.98114070384346e-05,
+        -0.9999999973253058,
+        2.1811830937614687e-05,
+        -0.004031721592000535
+      ],
+      [
+        -3.9052476112919324e-05,
+        2.1809104665821773e-05,
+        0.9999999989996337,
+        1.6439711322906412
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "measured_axis_translations": [
+      {
+        "label": "X_plus_10mm",
+        "physical_world_delta_mm": [
+          -10.009975584001296,
+          -0.002945412249599766,
+          -0.002368730037005662
+        ]
+      },
+      {
+        "label": "Y_plus_10mm",
+        "physical_world_delta_mm": [
+          0.0008722966621244055,
+          -10.001206410992184,
+          -1.6813111347602216e-05
+        ]
+      },
+      {
+        "label": "Z_plus_10mm",
+        "physical_world_delta_mm": [
+          -0.0004008224945284411,
+          -0.00024291245065422018,
+          9.999807580179265
+        ]
+      }
+    ],
+    "final_posture": "restored OEM initial joints through /move_joints"
+  },
+  "vision_point_error_mm": 3.918385061787464,
+  "geometry_notes": {
+    "reported_88_42_angle": "unsigned angle between peduncle axis and cutter +X, the arbiter blade-plane reference normal",
+    "CAD_triangle_face_angle_deg": 88.38482187996132,
+    "initial_1_63_angle": "cutter +X tilt from world vertical",
+    "CAD_triangle_initial_tilt_deg": 1.5985755552353218,
+    "sdk_flange_reference": "SDK FK matches wrist3_Link origin after 23.5 mm base Z datum conversion",
+    "gazebo_flange_link_reference": "CAD adapter origin is 50.952 mm beyond the SDK wrist reference along wrist Z",
+    "display_only_mesh_simplification": "3D display uses simplified CAD triangles quantized to 0.1 mm, calculations use complete unrounded triangles",
+    "harvest_endpoint": "computed offline, no new harvesting motion or successful harvest cycle in this audit"
+  },
+  "raw_evidence_files": [
+    "validation/frame_mapping/live_mapping.json",
+    "validation/frame_mapping/live_cartesian.json",
+    "validation/frame_mapping/live_robot.urdf",
+    "validation/stage2/vision/sdk_reference/vision_diagnostic.json"
+  ]
+}

@@ -186,3 +186,54 @@ ROS_DOMAIN_ID=138 ROS_LOCALHOST_ONLY=1 PYTHONDONTWRITEBYTECODE=1 \
 SDK 对齐后的完整单元测试 53/53 通过，包含阶段一既有 10 项回归。Overlay 构建的 9 个包全部通过。首次阶段二验收时，v4 场景完整性检查通过，保留 94 个原始实体和 60 株植株。真机业务目录对基准提交的差异检查为空。
 
 Gazebo 固定关节合并后，果筐碰撞名包含 `crate_col_*`。接触分类现同时识别该名称和 `basket_link`，回归测试使用现场碰撞名。两轮物理测试的历史接触日志保留原始分类，全果筐内结论来自独立实体位姿与 12 个球的几何检查。
+
+## 坐标映射实测与可视化追查
+
+用户确认初始外观符合真机安装关系，并要求用可视化和实际运动排查坐标映射。本轮以当前启动关节角 `[10.32,15.37,134.05,117.05,86.63,0]°` 为初始位姿，实际执行 8 个关节姿态和 8 个 SDK 笛卡尔目标。试验结束后通过 `/move_joints` 回到该初始位姿。采摘目标姿态采用原视觉曝光与原主控请求离线复算，本轮新增完整采摘周期为 0。[实测汇总](/data/tomato_gazebo/ros2_gazebo_ws/docs/evidence/frame_mapping_2026-11-20.json)
+
+### 独立验证 SDK、TF 与 Gazebo 物理位姿
+
+首先在初始位姿附近，依次令六个关节各增加 0.10 rad，最后回初始位姿，共 8 个测点。每次通过正常关节服务运动并静置采样。SDK FK 直接调用已安装官方动态库，实际物理手腕位姿取自 Gazebo `/get_entity_state` 的 `tomato_picker::wrist3_Link`。以这两组独立数据计算世界系至 SDK 基座的刚体变换，再与 TF 比较。
+
+然后使用这 8 个关节测点拟合的刚体变换，预测另一组 SDK 笛卡尔目标。通过正常 `/move_to_pose` 服务验证初始位置、SDK 基座 X/Y/Z 分别增加 10 mm、工具局部 X/Y/Z 分别增加 5°，最后返回初始目标，共 8 个测点。测试采用 `start2mid=true`，按硬件中间点规则反算请求值，使实际中间点恰好落在待测位姿。[SDK 请求构造](/data/tomato_gazebo/ros2_gazebo_ws/src/tomato_sim_adapters/tomato_sim_adapters/sim_aubo_motion_service.py:60) · [关节实测脚本](/data/tomato_gazebo/ros2_gazebo_ws/validation/frame_mapping/probe_mapping.py) · [笛卡尔实测脚本](/data/tomato_gazebo/ros2_gazebo_ws/validation/frame_mapping/probe_cartesian.py)
+
+| 检查项目 | 实测结果 |
+| --- | --- |
+| 8 个关节姿态的物理 wrist3 与 TF 最大位置差 | 0.10769 mm |
+| 8 个关节姿态的物理 wrist3 与 TF 最大旋转差 | 0.005641° |
+| 8 个笛卡尔服务返回结果 | 全部为 0 |
+| 独立笛卡尔目标的最大物理位置误差 | 0.043815 mm |
+| 独立笛卡尔目标的最大物理旋转误差 | 0.007892° |
+| SDK +X 10 mm 的实际世界位移 XYZ | `[-10.00998,-0.00295,-0.00237] mm` |
+| SDK +Y 10 mm 的实际世界位移 XYZ | `[0.00087,-10.00121,-0.00002] mm` |
+| SDK +Z 10 mm 的实际世界位移 XYZ | `[-0.00040,-0.00024,9.99981] mm` |
+
+这组测量确定了当前仿真的轴向与符号，SDK 基座约以世界 Z 轴旋转 180°，SDK +X/+Y 对应世界 −X/−Y，SDK +Z 对应世界 +Z。由 8 个关节姿态拟合出的 SDK 基座世界位置为 `[1.25194949,-0.00403172,1.64397113] m`。数据支持 SDK 运动接口、关节执行和 Gazebo 手腕几何之间的映射精度。相机曝光对应的视觉剪切点至场景真值误差为 3.9184 mm。[物理关节原始数据](/data/tomato_gazebo/ros2_gazebo_ws/validation/frame_mapping/live_mapping.json) · [独立笛卡尔原始数据](/data/tomato_gazebo/ros2_gazebo_ws/validation/frame_mapping/live_cartesian.json)
+
+### 34.36 mm 的来源可由工具定义逐项复现
+
+本次原主控请求的旋转记为 R。用“视觉剪切点减去请求法兰位置”并左乘 R 的转置，得到主控当前补偿隐含的法兰至刀口向量 `[0,0,100] mm`。模型从 SDK 对应 wrist3 原点出发，先沿局部 Z 到 CAD 固定座原点 50.952 mm，再组合刀座旋转和刀口偏移，得到 `[-4.4,-4.9,135.952] mm`。[100 mm 参数](/data/tomato_gazebo/robot_ws_fixed-v1.0-master/src/xc_robot_main_control/xc_robot_main_control/xc_robot_main_control_node.py:68) · [主控补偿](/data/tomato_gazebo/robot_ws_fixed-v1.0-master/src/xc_robot_main_control/xc_robot_main_control/xc_robot_main_control_node.py:1468) · [模型安装链](/data/tomato_gazebo/ros2_gazebo_ws/src/tomato_sim_adapters/tomato_sim_adapters/arm_kinematics.py:29)
+
+两套工具位置定义之间的空间差为 36.5502 mm，其中局部 Z 分量相差 35.952 mm。经过当前采摘姿态旋转并加上视觉点误差后，得到模型刀口至场景剪切点约 34.3574 mm。各分量均在 SDK 基座系下计算。
+
+| 误差项 | X / mm | Y / mm | Z / mm |
+| --- | --- | --- | --- |
+| CAD 刀口相对主控补偿隐含刀口 | +6.10938 | +35.95200 | +2.45875 |
+| 视觉剪切点相对场景剪切点 | −3.47721 | −1.79735 | +0.17965 |
+| 两项之和 | +2.63217 | +34.15465 | +2.63840 |
+
+SDK FK 对应 `wrist3_Link` 原点，经过 23.5 mm 基座 Z 基准转换后与物理手腕一致。Gazebo 中名为 `flange_link` 的坐标系则位于该原点沿手腕 Z 轴外伸 50.952 mm 处，属于当前 CAD 固定座装配基准。核对工具长度时需要明确使用哪一个原点。[SDK 基准转换](/data/tomato_gazebo/ros2_gazebo_ws/src/tomato_sim_adapters/tomato_sim_adapters/arm_kinematics.py:56) · [CAD 固定座基准](/data/tomato_gazebo/ros2_gazebo_ws/src/tomato_sim_description/urdf/mujoco_cad.xacro:538) · [刀口 TCP 定义](/data/tomato_gazebo/ros2_gazebo_ws/src/tomato_sim_description/urdf/tomato_picker_full.urdf.xacro:115)
+
+### 88.42° 的定义与实际刀片网格对照
+
+仲裁器计算的是果梗轴线与刀片平面法向的无向夹角，参考法向取刀座系 +X。夹角接近 0° 时果梗垂直穿过刀面，接近 90° 时果梗几乎平行于刀面。原主控本次输出 RPY `[90°,70°,180°]`，与当前刀座旋转组合后得到参考夹角 88.4162°。[仲裁器定义](/data/tomato_gazebo/ros2_gazebo_ws/src/tomato_sim_adapters/tomato_sim_adapters/harvest_physics_arbiter.py:240) · [原主控俯仰设定](/data/tomato_gazebo/robot_ws_fixed-v1.0-master/src/xc_robot_main_control/xc_robot_main_control/xc_robot_main_control_node.py:1416)
+
+用完整 0.2 mm 接触刀片 STL 的大面积三角面法向独立拟合，厚度为 0.200001 mm，刀面法向在刀座系下约为 `[0.99999985,0.00000014,0.00054944]`，距刀座 +X 约 0.0315°。采用这条实物网格法向，本次夹角为 88.3848°，果梗轴与刀面之间约为 1.6152°。将刀片放入 Gazebo 实际左指刚体位姿后，其法向与对应 TF 推算值的最大差为 0.003994°。
+
+在用户描述的初始位姿中，参考刀面倾斜为 1.6300°，完整网格拟合刀面倾斜为 1.5986°，腕部相机高于 TCP 114.0436 mm。初始外观与用户确认一致。初始外观验证和采摘指令对应的刀面方向均已量化。[完整网格与坐标分析](/data/tomato_gazebo/ros2_gazebo_ws/validation/frame_mapping/analyze_mapping.py)
+
+### 当前定位结果
+
+本轮把剩余问题定位到主控补偿使用的工具参考点及姿态约定与当前 CAD 刀口定义之间。单次初始外观可以核验总体装配关系，16 个实际姿态测点进一步确定了仿真内部 SDK 至物理手腕的映射。刀口目标位置与刀面朝向需要分别满足剪切条件。统一旋转所有表示坐标后，点距和交角保持相同，后续适配应依据工具参考点与刀面方向的完整刚体变换。
+
+本轮运动覆盖初始姿态附近的小幅平移和旋转。可视化的采摘目标姿态来自离线几何计算。显示网格采用简化三角面和 0.1 mm 显示量化，测量与法向拟合采用完整网格。真机工具标定的绝对值仍需与真实装配测量对应。
