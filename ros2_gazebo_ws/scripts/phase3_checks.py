@@ -26,6 +26,8 @@ from tomato_sim_adapters.arm_kinematics import OEM_HOME
 
 from simulation_config import harvest_launch_defaults, load_configuration, workspace
 
+RAIL_TRAVEL_SPEED_MM_S = 100
+
 WORKSPACE = workspace()
 SCENE = json.loads((WORKSPACE / 'validation/phase3/phase3_scene.json').read_text())
 TARGET = np.array(SCENE['cut_point_world'], dtype=float)
@@ -176,7 +178,7 @@ class Phase3Checks(Node):
             self.summary['rail_station_accepted_within_tolerance'] = True
             return
         direction = 1.0 if target > start else -1.0
-        request = ControlAGV.Request(linear_speed=int(direction * 120), angular_speed=0,
+        request = ControlAGV.Request(linear_speed=int(direction * RAIL_TRAVEL_SPEED_MM_S), angular_speed=0,
                                      lift_magnetic_sensor=False)
         try:
             response = self.call(self.control_agv, request, 'move rail through /control_agv', timeout=10)

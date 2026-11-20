@@ -1,4 +1,4 @@
-"""Implement the AGV service and patrol parameter with the rail controller."""
+"""Implement AGV commands for the rail and the two drive wheels."""
 import rclpy
 from rcl_interfaces.msg import SetParametersResult
 from rclpy.node import Node
@@ -7,6 +7,11 @@ from sensor_msgs.msg import JointState
 from std_msgs.msg import Float64MultiArray
 from xc_interfaces.msg import AGVStatus
 from xc_interfaces.srv import ControlAGV
+
+
+# Nominal drive-wheel tread radius in metres.
+DRIVE_WHEEL_RADIUS = 0.1025
+AUTONOMOUS_TRAVEL_SPEED_M_S = 0.1
 
 
 class SimAgv(Node):
@@ -29,6 +34,8 @@ class SimAgv(Node):
         self.lifted = False
         self.command_pub = self.create_publisher(
             Float64MultiArray, '/slide_velocity_controller/commands', 10)
+        self.drive_wheels_pub = self.create_publisher(
+            Float64MultiArray, '/drive_wheel_velocity_controller/commands', 10)
         self.status_pub = self.create_publisher(AGVStatus, '/agv_status', 10)
         self.create_subscription(JointState, '/joint_states', self.update, qos_profile_sensor_data)
         self.create_service(ControlAGV, '/control_agv', self.control)
@@ -49,6 +56,9 @@ class SimAgv(Node):
     def publish_speed(self, speed):
         self.command = speed
         self.command_pub.publish(Float64MultiArray(data=[speed]))
+        # The CAD datum's pi roll reverses the wheel axes relative to world +Y.
+        angular_speed = -speed / DRIVE_WHEEL_RADIUS
+        self.drive_wheels_pub.publish(Float64MultiArray(data=[angular_speed, angular_speed]))
 
     def update(self, message):
         if 'machine_slide' not in message.name:
@@ -97,7 +107,7 @@ class SimAgv(Node):
     def tick(self):
         if self.position is not None:
             if self.running:
-                self.publish_speed(self.direction * 0.1)
+                self.publish_speed(self.direction * AUTONOMOUS_TRAVEL_SPEED_M_S)
             elif self.manual_command_active:
                 self.publish_speed(self.command)
             elif not self.initial_stop_sent and self.command_pub.get_subscription_count():

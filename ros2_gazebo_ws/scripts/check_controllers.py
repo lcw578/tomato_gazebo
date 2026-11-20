@@ -7,7 +7,7 @@ import rclpy
 
 
 CONTROLLERS = {'joint_state_broadcaster', 'slide_velocity_controller',
-               'arm_trajectory_controller', 'gripper_controller'}
+               'drive_wheel_velocity_controller', 'arm_trajectory_controller', 'gripper_controller'}
 
 
 def main():

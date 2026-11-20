@@ -86,7 +86,7 @@ for _ in {1..24}; do
     sleep 1
 done
 cat "$evidence/controllers.log"
-awk '$1 ~ /^(joint_state_broadcaster|slide_velocity_controller|arm_trajectory_controller|gripper_controller)$/ && $NF=="active" {active[$1]=1} END {exit length(active)!=4}' "$evidence/controllers.log"
+/usr/bin/python3 scripts/check_controllers.py --wait 5
 
 world_name="$(/usr/bin/python3 -c 'import json, sys; print(json.load(open(sys.argv[1]))["world_name"])' "$evidence/phase1_world.json")"
 stdbuf -oL gz topic -e "/gazebo/$world_name/physics/contacts" > "$evidence/gazebo_contacts.log" 2>&1 &

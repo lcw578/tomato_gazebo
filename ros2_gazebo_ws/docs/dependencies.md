@@ -12,7 +12,7 @@
 | --- | --- |
 | v4 温室、轨道、植株模型和纹理 | 新项目的 `gazebo_migration/assets/`。来源为旧 MuJoCo 植株、公共视觉网格和地图生成器。其他环境可用 `TOMATO_GAZEBO_ASSETS` 指定资产目录。生成命令见 [地图说明](../../gazebo_migration/README.md) |
 | Phase 3/4 v4 采摘副本 | 从 v4 地图、精细植株 SDF、v2 世界和 `truss_ground_truth.json` 生成 |
-| 整机 CAD 网格 | 现有 `src/tomato_sim_description/meshes/`。可在具备 Standalone MJCF 及其引用网格时，用带 NumPy、SciPy 和 Trimesh 的 Python 执行 `scripts/export_mujoco_geometry.py` |
+| 整机 CAD 网格 | 生成到 `src/tomato_sim_description/meshes/`。已有资产升级到独立轮组时，需一并更新拆分后的车架和 10 个轮组网格。准备 Standalone MJCF 及其引用网格后，用带 NumPy、SciPy 和 Trimesh 的 Python 执行 `scripts/export_mujoco_geometry.py`，再构建 ROS 2 工作区。 |
 | AUBO 网格与 URDF | `TOMATO_ROBOT_SOURCE/src/xc_aubo_arm_control/aubo_description/` |
 | YOLO 权重 | 从旧项目复制到 `assets/weights/tomato-seg2025063018-yolov8-xucan.pt`，SHA-256 为 `22e7ab93d69bd98cf07411452e3924fc9f126dddcb30fa773d61030eae9b7c92` |
 | Python 环境 | 本机 `.venv_ros` 基于系统 Python，`.venv_yolo` 基于 `tomato_sim` Conda 环境。路径覆盖见 [构建说明](../README.md#配置和构建) |

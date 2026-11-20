@@ -46,9 +46,9 @@ def origin(parent, xyz, orient):
         ET.SubElement(parent, 'origin', xyz=values(xyz), rpy=values(orient.as_euler('xyz')))
 
 
-def inertial(parent, source):
+def inertial(parent, source, offset):
     node = ET.SubElement(parent, 'inertial')
-    origin(node, vector(source, 'pos', '0 0 0'), rotation(source))
+    origin(node, vector(source, 'pos', '0 0 0') - offset, rotation(source))
     ET.SubElement(node, 'mass', value=source.get('mass'))
     if 'fullinertia' in source.attrib:
         entries = vector(source, 'fullinertia', '')
@@ -59,9 +59,10 @@ def inertial(parent, source):
 
 
 def export_link(name, sources, mesh_filter=lambda geom: True, offset=None, source_inertia=True):
+    offset = np.zeros(3) if offset is None else offset
     dest = macro(name + '_cad')
     if source_inertia:
-        inertial(dest, sources[0].find('inertial'))
+        inertial(dest, sources[0].find('inertial'), offset)
     groups = defaultdict(list)
     for source in sources:
         for geom in source.findall('geom'):
@@ -69,7 +70,7 @@ def export_link(name, sources, mesh_filter=lambda geom: True, offset=None, sourc
                 continue
             if geom.get('type') == 'cylinder':
                 prim = ET.SubElement(dest, 'visual', name=geom.get('name'))
-                origin(prim, vector(geom, 'pos', '0 0 0'), rotation(geom))
+                origin(prim, vector(geom, 'pos', '0 0 0') - offset, rotation(geom))
                 radius, half_length = vector(geom, 'size', '')
                 ET.SubElement(ET.SubElement(prim, 'geometry'), 'cylinder',
                               radius=str(radius), length=str(2*half_length))
@@ -80,8 +81,7 @@ def export_link(name, sources, mesh_filter=lambda geom: True, offset=None, sourc
             mesh = trimesh.load_mesh(SOURCE.parent / asset.get('file'), process=False)
             mesh.vertices *= vector(asset, 'scale', '1 1 1')
             mesh.vertices = rotation(geom).apply(mesh.vertices) + vector(geom, 'pos', '0 0 0')
-            if offset is not None:
-                mesh.vertices -= offset
+            mesh.vertices -= offset
             groups[geom.get('rgba', '0.55 0.57 0.60 1')].append(mesh)
     for index, (color, meshes) in enumerate(groups.items()):
         part = f'{name}_{index}'
@@ -93,8 +93,47 @@ def export_link(name, sources, mesh_filter=lambda geom: True, offset=None, sourc
     return dest
 
 
+def export_wheels(wheels):
+    assembly = macro('chassis_wheels')
+    states = macro('chassis_wheel_interfaces')
+    drive_limits = {actuator.get('joint'): vector(actuator, 'ctrlrange', '')
+                    for actuator in ROOT.findall('actuator/velocity')}
+    for wheel in wheels:
+        name = wheel.get('name')
+        hinge = wheel.find('joint')
+        joint_name = hinge.get('name')
+        center = vector(hinge, 'pos', '0 0 0')
+        wheel_offset = vector(wheel, 'pos', '0 0 0')
+        cad = export_link(name, [wheel], offset=center)
+        mesh = trimesh.load_mesh(TARGET / f'meshes/{name}_0.stl', process=False)
+        radius = np.linalg.norm(mesh.vertices[:, [0, 2]], axis=1).max()
+        low, high = mesh.bounds[:, 1]
+        collision = ET.SubElement(cad, 'collision', name=f'{name}_tread')
+        origin(collision, [0, (low + high) / 2, 0], Rotation.from_euler('x', np.pi / 2))
+        ET.SubElement(ET.SubElement(collision, 'geometry'), 'cylinder',
+                      radius=format(radius, '.9g'), length=format(high - low, '.9g'))
+        link = ET.SubElement(assembly, 'link', name=name)
+        ET.SubElement(link, f'xacro:{name}_cad')
+        joint = ET.SubElement(assembly, 'joint', name=joint_name, type='continuous')
+        origin(joint, wheel_offset + center, Rotation.identity())
+        ET.SubElement(joint, 'parent', link='chassis_cad_datum')
+        ET.SubElement(joint, 'child', link=name)
+        ET.SubElement(joint, 'axis', xyz=hinge.get('axis'))
+        ET.SubElement(joint, 'dynamics', damping=hinge.get('damping'),
+                      friction=hinge.get('frictionloss', '0'))
+        control = ET.SubElement(states, 'joint', name=joint_name)
+        if joint_name in drive_limits:
+            command = ET.SubElement(control, 'command_interface', name='velocity')
+            for limit, speed in zip(('min', 'max'), drive_limits[joint_name]):
+                ET.SubElement(command, 'param', name=limit).text = format(speed, 'g')
+        ET.SubElement(control, 'state_interface', name='position')
+        ET.SubElement(control, 'state_interface', name='velocity')
+
+
 chassis, lift, tool = (body(name) for name in ('chassis', 'lift', 'base_link'))
-export_link('chassis', [chassis, *[b for b in chassis.findall('body')]])
+wheels = chassis.findall("body[joint]")
+export_link('chassis', [chassis, *[part for part in chassis.findall('body') if part not in wheels]])
+export_wheels(wheels)
 # The crate CAD is mounted to the carriage at the zero-height baseline pose.
 def is_crate(geom):
     return geom.get('name') == 'v_part_330'

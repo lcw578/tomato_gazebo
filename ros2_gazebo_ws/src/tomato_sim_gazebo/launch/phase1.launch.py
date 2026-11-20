@@ -1,4 +1,4 @@
-"""Launch the Classic verification world with the robot and four controllers."""
+"""Launch the Classic verification world with the robot and its controllers."""
 import os
 import json
 import xml.etree.ElementTree as ET
@@ -85,6 +85,7 @@ def generate_launch_description():
     # Full v4 contact and camera initialization can exceed the default wait.
     controllers = Node(package='controller_manager', executable='spawner', output='screen',
                        arguments=['joint_state_broadcaster', 'slide_velocity_controller',
+                                  'drive_wheel_velocity_controller',
                                   'arm_trajectory_controller', 'gripper_controller',
                                   '--controller-manager-timeout', '60', '--switch-timeout', '30'])
 

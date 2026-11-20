@@ -84,10 +84,14 @@ def plan_overlay(config):
             links[Path(name, 'weights', item.name)] = item
     links[Path('xc_robot_main_control/weights/best.pt')] = weight
 
-    cad_meshes = root / 'src/tomato_sim_description/meshes'
-    for name in ('chassis_0', 'lift_0', 'basket_0', 'cutter_0', 'cutter_1', 'cutter_2',
-                 'gear_0', 'left_finger_0', 'right_finger_0'):
-        required_file(cad_meshes / f'{name}.stl')
+    description = root / 'src/tomato_sim_description'
+    cad = ET.parse(description / 'urdf/mujoco_cad.xacro')
+    for mesh in cad.findall('.//mesh'):
+        relative = mesh.get('filename').removeprefix('package://tomato_sim_description/')
+        try:
+            required_file(description / relative)
+        except ValueError as error:
+            raise ValueError(f'{error}. Regenerate the CAD with scripts/export_mujoco_geometry.py.') from error
 
     aubo = source / AUBO_PACKAGE
     for name in ('mesh', 'urdf'):

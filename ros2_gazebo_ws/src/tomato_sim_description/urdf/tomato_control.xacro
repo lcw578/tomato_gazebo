@@ -33,6 +33,7 @@
       <hardware><plugin>gazebo_ros2_control/GazeboSystem</plugin></hardware>
       <xacro:controlled_joint name="machine_slide" command="velocity"
                               initial="$(arg slide_initial)"/>
+      <xacro:chassis_wheel_interfaces/>
       <xacro:controlled_joint name="shoulder_joint" command="position" initial="0.1801179788"/>
       <xacro:controlled_joint name="upperArm_joint" command="position" initial="0.2682571060"/>
       <xacro:controlled_joint name="foreArm_joint" command="position" initial="2.3396138623"/>

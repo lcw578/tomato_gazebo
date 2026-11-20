@@ -38,7 +38,7 @@ cd /data/tomato_gazebo/ros2_gazebo_ws
 
 | 验收内容 | 证据 |
 | --- | --- |
-| Phase 1 构建和四个控制器 | `phase1_build.log`、`controllers.log` |
+| Phase 1 构建和控制器 | `phase1_build.log`、`controllers.log` |
 | 零位与两个非零位的 TCP | `phase1_summary.json`、`fk_reference.json`、`tf2_echo_zero.log`、`tf2_echo_pose_a.log`、`tf2_echo_pose_b.log` |
 | 轨道正反向、机械臂动作、双刀爪与 Gazebo 接触数据 | `phase1_summary.json`、`gazebo_contacts.log` |
 | 安装目录里的旧 YOLOv8 模型 | `yolov8_weights.sha256`、`yolov8_inference.log` |
@@ -66,11 +66,14 @@ ros2 launch tomato_sim_gazebo baseline.launch.py gui:=true
 | 底盘、升降台、筐、剪夹末端 | `export_mujoco_geometry.py` 从 `tomato_picker_standalone.xml` 和原 STL 导出外观，Gazebo 接触采用若干简化包络。筐固定在底盘上，位置采用旧场景零升降高度的 CAD 基准 |
 | TCP | `wrist3_Link → flange_link → cutter_base_link → tool_tcp`，剪口校准引用旧工程的 `contact_tcp` |
 | 轨道 | `machine_slide` 由 `slide_velocity_controller` 控制，命令为 m/s |
+| 底盘轮组 | 两个主动轮和八个从动轮均有独立关节、碰撞体和关节状态。主动轮速度控制器按 `act_left_joint`、`act_right_joint` 顺序接收 rad/s。 |
 | 机械臂 | `arm_trajectory_controller` 接收六关节 `FollowJointTrajectory` |
 | 刀爪 | `gripper_controller` 控制齿轮轴，两片刀爪按 MuJoCo 的比例映射同步移动 |
 | 相机 | 两个侧向 L515 和腕部 D405，以 `libgazebo_ros_camera.so` 发布原始 RGB-D |
 
 真机业务源码通过软链接参与编译。仿真工作空间中的两个本地打包覆盖只安装实际存在的权重，并解除真机 RealSense 驱动的打包依赖。`yolov8_service` 读取的 `weights/best.pt` 指向新项目的 `/data/tomato_gazebo/assets/weights/tomato-seg2025063018-yolov8-xucan.pt`。CPU 推理已确认它是分割模型，类别为 `stem`、`tomato`、`trunk`。腕部专用模型和 MoGe 文件仍待提供。本机权重来源见 [依赖和版本管理](docs/dependencies.md)。
+
+AGV 启停指令同时给滑轨和两只主动轮下发速度。巡航默认速度为 `0.1 m/s`，等于 `10 cm/s`。车架平移由 `machine_slide` 驱动，从动轮通过接触自由转动。v4 轨道是视觉几何。
 
 ## Phase 2 服务
 

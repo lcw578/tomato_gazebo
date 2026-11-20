@@ -24,6 +24,368 @@
       </material>
     </visual>
   </xacro:macro>
+  <xacro:macro name="chassis_wheels" params="">
+    <link name="small_right_front">
+      <xacro:small_right_front_cad />
+    </link>
+    <joint name="small_right_front_joint" type="continuous">
+      <origin xyz="0.497042 0.392916 0.038" rpy="0 0 0" />
+      <parent link="chassis_cad_datum" />
+      <child link="small_right_front" />
+      <axis xyz="0 1 0" />
+      <dynamics damping="0.001" friction="0.02" />
+    </joint>
+    <link name="small_left_front">
+      <xacro:small_left_front_cad />
+    </link>
+    <joint name="small_left_front_joint" type="continuous">
+      <origin xyz="0.497042 -0.377584 0.038" rpy="0 0 0" />
+      <parent link="chassis_cad_datum" />
+      <child link="small_left_front" />
+      <axis xyz="0 1 0" />
+      <dynamics damping="0.001" friction="0.02" />
+    </joint>
+    <link name="small_right_behind">
+      <xacro:small_right_behind_cad />
+    </link>
+    <joint name="small_right_behind_joint" type="continuous">
+      <origin xyz="-0.513328 0.392916 0.038" rpy="0 0 0" />
+      <parent link="chassis_cad_datum" />
+      <child link="small_right_behind" />
+      <axis xyz="0 1 0" />
+      <dynamics damping="0.001" friction="0.02" />
+    </joint>
+    <link name="small_left_behind">
+      <xacro:small_left_behind_cad />
+    </link>
+    <joint name="small_left_behind_joint" type="continuous">
+      <origin xyz="-0.513328 -0.373084 0.038" rpy="0 0 0" />
+      <parent link="chassis_cad_datum" />
+      <child link="small_left_behind" />
+      <axis xyz="0 1 0" />
+      <dynamics damping="0.001" friction="0.02" />
+    </joint>
+    <link name="big_left_front">
+      <xacro:big_left_front_cad />
+    </link>
+    <joint name="big_left_front_joint" type="continuous">
+      <origin xyz="0.311857 -0.27333 -0.0585" rpy="0 0 0" />
+      <parent link="chassis_cad_datum" />
+      <child link="big_left_front" />
+      <axis xyz="0 1 0" />
+      <dynamics damping="0.001" friction="0.02" />
+    </joint>
+    <link name="big_right_front">
+      <xacro:big_right_front_cad />
+    </link>
+    <joint name="big_right_front_joint" type="continuous">
+      <origin xyz="0.311857 0.293162 -0.0585" rpy="0 0 0" />
+      <parent link="chassis_cad_datum" />
+      <child link="big_right_front" />
+      <axis xyz="0 1 0" />
+      <dynamics damping="0.001" friction="0.02" />
+    </joint>
+    <link name="big_right_behind">
+      <xacro:big_right_behind_cad />
+    </link>
+    <joint name="big_right_behind_joint" type="continuous">
+      <origin xyz="-0.328143 0.293162 -0.0585" rpy="0 0 0" />
+      <parent link="chassis_cad_datum" />
+      <child link="big_right_behind" />
+      <axis xyz="0 1 0" />
+      <dynamics damping="0.001" friction="0.02" />
+    </joint>
+    <link name="big_left_behind">
+      <xacro:big_left_behind_cad />
+    </link>
+    <joint name="big_left_behind_joint" type="continuous">
+      <origin xyz="-0.328143 -0.27333 -0.0585" rpy="0 0 0" />
+      <parent link="chassis_cad_datum" />
+      <child link="big_left_behind" />
+      <axis xyz="0 1 0" />
+      <dynamics damping="0.001" friction="0.02" />
+    </joint>
+    <link name="act_right">
+      <xacro:act_right_cad />
+    </link>
+    <joint name="act_right_joint" type="continuous">
+      <origin xyz="-0.008149 0.340531 -0.035991" rpy="0 0 0" />
+      <parent link="chassis_cad_datum" />
+      <child link="act_right" />
+      <axis xyz="0 1 0" />
+      <dynamics damping="0.002" friction="0" />
+    </joint>
+    <link name="act_left">
+      <xacro:act_left_cad />
+    </link>
+    <joint name="act_left_joint" type="continuous">
+      <origin xyz="-0.008149 -0.320698 -0.035991" rpy="0 0 0" />
+      <parent link="chassis_cad_datum" />
+      <child link="act_left" />
+      <axis xyz="0 1 0" />
+      <dynamics damping="0.002" friction="0" />
+    </joint>
+  </xacro:macro>
+  <xacro:macro name="chassis_wheel_interfaces" params="">
+    <joint name="small_right_front_joint">
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+    </joint>
+    <joint name="small_left_front_joint">
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+    </joint>
+    <joint name="small_right_behind_joint">
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+    </joint>
+    <joint name="small_left_behind_joint">
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+    </joint>
+    <joint name="big_left_front_joint">
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+    </joint>
+    <joint name="big_right_front_joint">
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+    </joint>
+    <joint name="big_right_behind_joint">
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+    </joint>
+    <joint name="big_left_behind_joint">
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+    </joint>
+    <joint name="act_right_joint">
+      <command_interface name="velocity">
+        <param name="min">-40</param>
+        <param name="max">40</param>
+      </command_interface>
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+    </joint>
+    <joint name="act_left_joint">
+      <command_interface name="velocity">
+        <param name="min">-40</param>
+        <param name="max">40</param>
+      </command_interface>
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+    </joint>
+  </xacro:macro>
+  <xacro:macro name="small_right_front_cad" params="">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="0.112089" />
+      <inertia ixx="3.53535e-05" iyy="5.21605e-05" izz="3.53535e-05" ixy="-0" ixz="7e-12" iyz="0" />
+    </inertial>
+    <visual name="small_right_front_0">
+      <geometry>
+        <mesh filename="package://tomato_sim_description/meshes/small_right_front_0.stl" />
+      </geometry>
+      <material name="small_right_front_0">
+        <color rgba="0.55 0.57 0.60 1" />
+      </material>
+    </visual>
+    <collision name="small_right_front_tread">
+      <origin xyz="0 2.5983899832e-07 0" rpy="1.5707963268 0 0" />
+      <geometry>
+        <cylinder radius="0.0315000178" length="0.0360000003" />
+      </geometry>
+    </collision>
+  </xacro:macro>
+  <xacro:macro name="small_left_front_cad" params="">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="0.112089" />
+      <inertia ixx="3.53535e-05" iyy="5.21605e-05" izz="3.53535e-05" ixy="-0" ixz="8e-12" iyz="-0" />
+    </inertial>
+    <visual name="small_left_front_0">
+      <geometry>
+        <mesh filename="package://tomato_sim_description/meshes/small_left_front_0.stl" />
+      </geometry>
+      <material name="small_left_front_0">
+        <color rgba="0.55 0.57 0.60 1" />
+      </material>
+    </visual>
+    <collision name="small_left_front_tread">
+      <origin xyz="0 2.5983899832e-07 0" rpy="1.5707963268 0 0" />
+      <geometry>
+        <cylinder radius="0.0315000178" length="0.0360000003" />
+      </geometry>
+    </collision>
+  </xacro:macro>
+  <xacro:macro name="small_right_behind_cad" params="">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="0.112089" />
+      <inertia ixx="3.53535e-05" iyy="5.21604e-05" izz="3.53535e-05" ixy="0" ixz="1.4e-11" iyz="-0" />
+    </inertial>
+    <visual name="small_right_behind_0">
+      <geometry>
+        <mesh filename="package://tomato_sim_description/meshes/small_right_behind_0.stl" />
+      </geometry>
+      <material name="small_right_behind_0">
+        <color rgba="0.55 0.57 0.60 1" />
+      </material>
+    </visual>
+    <collision name="small_right_behind_tread">
+      <origin xyz="0 2.5983899832e-07 0" rpy="1.5707963268 0 0" />
+      <geometry>
+        <cylinder radius="0.0315000569" length="0.0360000003" />
+      </geometry>
+    </collision>
+  </xacro:macro>
+  <xacro:macro name="small_left_behind_cad" params="">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="0.112089" />
+      <inertia ixx="3.53535e-05" iyy="5.21604e-05" izz="3.53535e-05" ixy="0" ixz="1.4e-11" iyz="-0" />
+    </inertial>
+    <visual name="small_left_behind_0">
+      <geometry>
+        <mesh filename="package://tomato_sim_description/meshes/small_left_behind_0.stl" />
+      </geometry>
+      <material name="small_left_behind_0">
+        <color rgba="0.55 0.57 0.60 1" />
+      </material>
+    </visual>
+    <collision name="small_left_behind_tread">
+      <origin xyz="0 2.5983899832e-07 0" rpy="1.5707963268 0 0" />
+      <geometry>
+        <cylinder radius="0.0315000569" length="0.0360000003" />
+      </geometry>
+    </collision>
+  </xacro:macro>
+  <xacro:macro name="big_left_front_cad" params="">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="1.537764" />
+      <inertia ixx="0.0033158396" iyy="0.0052569777" izz="0.0033027707" ixy="-2e-11" ixz="1.3318e-07" iyz="-2.4e-11" />
+    </inertial>
+    <visual name="big_left_front_0">
+      <geometry>
+        <mesh filename="package://tomato_sim_description/meshes/big_left_front_0.stl" />
+      </geometry>
+      <material name="big_left_front_0">
+        <color rgba="0.55 0.57 0.60 1" />
+      </material>
+    </visual>
+    <collision name="big_left_front_tread">
+      <origin xyz="0 0.0032462589443 0" rpy="1.5707963268 0 0" />
+      <geometry>
+        <cylinder radius="0.100000024" length="0.0700000003" />
+      </geometry>
+    </collision>
+  </xacro:macro>
+  <xacro:macro name="big_right_front_cad" params="">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="1.537764" />
+      <inertia ixx="0.0033158396" iyy="0.0052569777" izz="0.0033027707" ixy="2.4e-11" ixz="-1.33181e-07" iyz="9e-12" />
+    </inertial>
+    <visual name="big_right_front_0">
+      <geometry>
+        <mesh filename="package://tomato_sim_description/meshes/big_right_front_0.stl" />
+      </geometry>
+      <material name="big_right_front_0">
+        <color rgba="0.55 0.57 0.60 1" />
+      </material>
+    </visual>
+    <collision name="big_right_front_tread">
+      <origin xyz="0 -0.0032457411289 0" rpy="1.5707963268 0 0" />
+      <geometry>
+        <cylinder radius="0.100000024" length="0.0700000003" />
+      </geometry>
+    </collision>
+  </xacro:macro>
+  <xacro:macro name="big_right_behind_cad" params="">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="1.537764" />
+      <inertia ixx="0.0033158396" iyy="0.0052569779" izz="0.0033027711" ixy="4.4e-11" ixz="-1.33199e-07" iyz="1.6e-11" />
+    </inertial>
+    <visual name="big_right_behind_0">
+      <geometry>
+        <mesh filename="package://tomato_sim_description/meshes/big_right_behind_0.stl" />
+      </geometry>
+      <material name="big_right_behind_0">
+        <color rgba="0.55 0.57 0.60 1" />
+      </material>
+    </visual>
+    <collision name="big_right_behind_tread">
+      <origin xyz="0 -0.0032457411289 0" rpy="1.5707963268 0 0" />
+      <geometry>
+        <cylinder radius="0.100000039" length="0.0700000003" />
+      </geometry>
+    </collision>
+  </xacro:macro>
+  <xacro:macro name="big_left_behind_cad" params="">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="1.537764" />
+      <inertia ixx="0.0033158396" iyy="0.0052569779" izz="0.0033027711" ixy="-4.3e-11" ixz="1.332e-07" iyz="-1.1e-11" />
+    </inertial>
+    <visual name="big_left_behind_0">
+      <geometry>
+        <mesh filename="package://tomato_sim_description/meshes/big_left_behind_0.stl" />
+      </geometry>
+      <material name="big_left_behind_0">
+        <color rgba="0.55 0.57 0.60 1" />
+      </material>
+    </visual>
+    <collision name="big_left_behind_tread">
+      <origin xyz="0 0.0032462589443 0" rpy="1.5707963268 0 0" />
+      <geometry>
+        <cylinder radius="0.100000039" length="0.0700000003" />
+      </geometry>
+    </collision>
+  </xacro:macro>
+  <xacro:macro name="act_right_cad" params="">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="1.473367" />
+      <inertia ixx="0.0049731057" iyy="0.0093338165" izz="0.0049725434" ixy="1.22021e-07" ixz="6.44456e-07" iyz="-1.8634e-07" />
+    </inertial>
+    <visual name="act_right_0">
+      <geometry>
+        <mesh filename="package://tomato_sim_description/meshes/act_right_0.stl" />
+      </geometry>
+      <material name="act_right_0">
+        <color rgba="0.55 0.57 0.60 1" />
+      </material>
+    </visual>
+    <collision name="act_right_tread">
+      <origin xyz="0 0.001885259524 0" rpy="1.5707963268 0 0" />
+      <geometry>
+        <cylinder radius="0.102511312" length="0.0500000007" />
+      </geometry>
+    </collision>
+  </xacro:macro>
+  <xacro:macro name="act_left_cad" params="">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="1.473367" />
+      <inertia ixx="0.0049731058" iyy="0.0093338166" izz="0.0049725435" ixy="-1.22023e-07" ixz="6.44463e-07" iyz="1.86343e-07" />
+    </inertial>
+    <visual name="act_left_0">
+      <geometry>
+        <mesh filename="package://tomato_sim_description/meshes/act_left_0.stl" />
+      </geometry>
+      <material name="act_left_0">
+        <color rgba="0.55 0.57 0.60 1" />
+      </material>
+    </visual>
+    <collision name="act_left_tread">
+      <origin xyz="0 -0.0018857400864 0" rpy="1.5707963268 0 0" />
+      <geometry>
+        <cylinder radius="0.102511312" length="0.0500000007" />
+      </geometry>
+    </collision>
+  </xacro:macro>
   <xacro:macro name="lift_cad" params="">
     <inertial>
       <origin xyz="0.14274594 0.009534775 -0.74663947" rpy="0 0 0" />

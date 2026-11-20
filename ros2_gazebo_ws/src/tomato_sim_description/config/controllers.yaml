@@ -6,6 +6,8 @@ controller_manager:
       type: joint_state_broadcaster/JointStateBroadcaster
     slide_velocity_controller:
       type: velocity_controllers/JointGroupVelocityController
+    drive_wheel_velocity_controller:
+      type: velocity_controllers/JointGroupVelocityController
     arm_trajectory_controller:
       type: joint_trajectory_controller/JointTrajectoryController
     gripper_controller:
@@ -14,6 +16,10 @@ controller_manager:
 slide_velocity_controller:
   ros__parameters:
     joints: [machine_slide]
+
+drive_wheel_velocity_controller:
+  ros__parameters:
+    joints: [act_left_joint, act_right_joint]
 
 arm_trajectory_controller:
   ros__parameters:
