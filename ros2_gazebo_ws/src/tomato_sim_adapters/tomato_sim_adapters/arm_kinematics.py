@@ -10,6 +10,7 @@ JOINTS = ['shoulder_joint', 'upperArm_joint', 'foreArm_joint',
           'wrist1_joint', 'wrist2_joint', 'wrist3_joint']
 OEM_HOME = np.deg2rad([10.32, 15.37, 134.05, 117.05, 86.63, 0.0])
 BOUND = 3.0543
+SDK_BASE_Z_OFFSET = 0.0235
 
 
 class ArmKinematics:
@@ -51,6 +52,15 @@ class ArmKinematics:
 
     def fk_tcp(self, q):
         return self.fk(q) * self.wrist_to_tcp
+
+    def fk_sdk(self, q):
+        pose = self.fk(q)
+        return kdl.Frame(pose.M, pose.p - kdl.Vector(0.0, 0.0, SDK_BASE_Z_OFFSET))
+
+    def ik_sdk(self, xyz, rotation, seed, alternatives=False):
+        # SDK I5 D1 is 0.0985 m. The upstream URDF uses 0.122 m.
+        wrist_xyz = np.asarray(xyz) + [0.0, 0.0, SDK_BASE_Z_OFFSET]
+        return self.ik(wrist_xyz, rotation, seed, alternatives=alternatives)
 
     def ik(self, xyz, rotation, seed, alternatives=False):
         goal = kdl.Frame(rotation, kdl.Vector(*xyz))

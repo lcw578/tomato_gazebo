@@ -57,6 +57,38 @@ def waypoints(request, gripper_length=0.0):
     return target + offset, target, rotation
 
 
+def sdk_waypoints(request):
+    """Reproduce the hardware create_waypoint flange position and rotation."""
+    target = np.array([request.x, request.y, request.z])
+    angles = np.array([request.rx, request.ry, request.rz, request.mid2target_angle])
+    if not np.isfinite(target).all() or not np.isfinite(angles).all():
+        raise ValueError('Pose must be finite')
+    rx, ry, rz, angle = angles
+    degrees = math.degrees(angle)
+    if request.y > 0.0:
+        if -110 < degrees < -70:
+            angle = -math.pi / 2
+        elif degrees > 90:
+            angle -= math.pi
+        elif degrees <= -110:
+            angle += math.pi
+    else:
+        if 70 < degrees < 110:
+            angle = math.pi / 2
+        elif degrees >= 110:
+            angle -= math.pi
+        elif degrees < -90:
+            angle += math.pi
+    sign = 1 if request.y > 0.0 else -1
+    offset = [sign * .1 * math.sin(angle), -sign * .1 * math.cos(angle), 0.0]
+    if angle == math.pi / 2:
+        offset = [0.0, 0.0 if sign > 0 else .1, .1]
+    rotation = kdl.Rotation.RPY(rx, ry, rz + angle)
+    if abs(angle) == math.pi / 2:
+        rotation = kdl.Rotation.RPY(math.radians(150), 0.0, math.pi if sign > 0 else 0.0)
+    return target + offset, target, rotation
+
+
 class SimArm(Node):
     def __init__(self):
         super().__init__('sim_aubo_motion_service')
@@ -75,6 +107,9 @@ class SimArm(Node):
         self.gripper_length = self.declare_parameter('request_gripper_length', 0.0).value
         if not math.isfinite(self.gripper_length) or self.gripper_length < 0.0:
             raise ValueError('request_gripper_length must be finite and nonnegative')
+        self.pose_reference = self.declare_parameter('pose_reference', 'tcp').value
+        if self.pose_reference not in ('tcp', 'sdk_flange'):
+            raise ValueError('pose_reference must be tcp or sdk_flange')
         self.state_lock = threading.Condition()
         self.q = None
         self.velocity = None
@@ -121,7 +156,7 @@ class SimArm(Node):
             q = self.q
         if q is None:
             return
-        actual = self.kin.fk_tcp(q)
+        actual = self.kin.fk_sdk(q) if self.pose_reference == 'sdk_flange' else self.kin.fk_tcp(q)
         status = ArmStatus(joints=np.rad2deg(q).tolist())
         status.position.x, status.position.y, status.position.z = actual.p
         (status.orientation.x, status.orientation.y,
@@ -205,16 +240,20 @@ class SimArm(Node):
             response.result = 30001
             return response
         try:
-            midpoint, target, rotation = waypoints(request, self.gripper_length)
+            sdk_request = self.pose_reference == 'sdk_flange'
+            midpoint, target, rotation = (sdk_waypoints(request) if sdk_request
+                                          else waypoints(request, self.gripper_length))
+            inverse = self.kin.ik_sdk if sdk_request else self.kin.ik_tcp
+            forward = self.kin.fk_sdk if sdk_request else self.kin.fk_tcp
             q = self.current()
             if not request.mid_to_target:
-                q = self.kin.ik_tcp(midpoint, rotation, q, alternatives=True)
+                q = inverse(midpoint, rotation, q, alternatives=True)
             if not request.start2mid:
                 start = midpoint
                 if request.mid_to_target:
                     if self.midpoint_q is None:
                         raise ValueError('The arm must first move to a midpoint')
-                    pose = self.kin.fk_tcp(q)
+                    pose = forward(q)
                     start = np.array(list(pose.p))
                 span = np.linalg.norm(target - start)
                 count = max(1, math.ceil(span / 0.02))
@@ -222,7 +261,7 @@ class SimArm(Node):
                 seed = q
                 for index in range(1, count + 1):
                     xyz = start + (target - start) * index / count
-                    next_q = self.kin.ik_tcp(xyz, rotation, seed)
+                    next_q = inverse(xyz, rotation, seed)
                     if np.max(np.abs(next_q - seed)) > 0.65:
                         raise ValueError('Approach IK changed joint branches')
                     points.append(next_q)

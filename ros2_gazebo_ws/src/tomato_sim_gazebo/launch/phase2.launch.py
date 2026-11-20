@@ -49,6 +49,7 @@ def generate_launch_description():
             LaunchConfiguration('action_timeout_scale'), value_type=float),
         'request_gripper_length': ParameterValue(
             LaunchConfiguration('request_gripper_length'), value_type=float),
+        'pose_reference': LaunchConfiguration('pose_reference'),
     }], output='screen'))
     agv = Node(package='tomato_sim_adapters', executable='sim_agv_control_node',
                parameters=[use_time, {
@@ -68,6 +69,7 @@ def generate_launch_description():
         DeclareLaunchArgument('active_camera_side', default_value='left'),
         DeclareLaunchArgument('remote_depth_units_per_metre', default_value='4000'),
         DeclareLaunchArgument('request_gripper_length', default_value='0.0'),
+        DeclareLaunchArgument('pose_reference', default_value='tcp'),
         DeclareLaunchArgument('world_record', default_value=''),
         DeclareLaunchArgument('positive_rfid_m', default_value='2.4'),
         DeclareLaunchArgument('negative_rfid_m', default_value='-1.85'),

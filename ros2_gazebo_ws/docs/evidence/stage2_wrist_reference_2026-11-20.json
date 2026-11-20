@@ -1,0 +1,175 @@
+{
+  "scope": "fresh image/GT service, offline FK/IK and stationary live ArmStatus verification",
+  "user_reference": "camera above horizontal blade plane at the initial posture; wrist may rotate during harvesting",
+  "initial_state": {
+    "label": "initial",
+    "q_rad": [
+      0.18011797880581482,
+      0.2682571060315284,
+      2.339613862298399,
+      2.0429078894593626,
+      1.5119787310026875,
+      0.0
+    ],
+    "tcp_world_m": [
+      0.7806485159578382,
+      0.051874676285296226,
+      2.046375885462851
+    ],
+    "tcp_sdk_base_m": [
+      0.4713430277613482,
+      -0.055874676285295806,
+      0.402496885462851
+    ],
+    "blade_plane_tilt_from_horizontal_deg": 1.6300000000004655,
+    "camera_above_tcp_m": 0.11404356418359485,
+    "cut_point_error_m": 0.872747450552453,
+    "cut_point_error_world_m": [
+      -0.4192587363655018,
+      0.7648941958433271,
+      -0.029104872310300678
+    ],
+    "blade_peduncle_angle_deg": 85.65863343294996
+  },
+  "native_sdk_request": {
+    "xyz_m": [
+      0.04860708165105754,
+      0.6072221649501361,
+      0.43178140574764534
+    ],
+    "rpy_rad": [
+      1.5707963267948966,
+      1.2217304763960306,
+      3.141592653589793
+    ],
+    "rpy_deg": [
+      90.0,
+      70.0,
+      180.0
+    ],
+    "mid2target_angle_rad": 0.0,
+    "gripper_length_m": 0.1,
+    "start2mid": false,
+    "mid_to_target": false,
+    "sim_midpoint_base_m": [
+      0.04860708165105754,
+      0.5072221649501362,
+      0.43178140574764534
+    ],
+    "sim_target_base_m": [
+      0.04860708165105754,
+      0.6072221649501361,
+      0.43178140574764534
+    ],
+    "sim_tcp_interpretation_crossing_angle_deg": 85.64493656907082,
+    "sdk_flange_interpretation_crossing_angle_deg": 88.41621073507771
+  },
+  "sdk_request_endpoints": [
+    {
+      "label": "midpoint",
+      "q_rad": [
+        1.7500403490690584,
+        -0.15675355202060803,
+        1.8898110160177817,
+        2.0465630166937006,
+        1.3915527069703835,
+        -1.221729523221508
+      ],
+      "tcp_world_m": [
+        1.1972751324146376,
+        -0.6471741702339459,
+        2.078118942082323
+      ],
+      "tcp_sdk_base_m": [
+        0.05471641130454885,
+        0.6431741702339463,
+        0.4342399420823233
+      ],
+      "blade_plane_tilt_from_horizontal_deg": 69.99996123413116,
+      "camera_above_tcp_m": 0.035103008908536265,
+      "cut_point_error_m": 0.0659507247820199,
+      "cut_point_error_world_m": [
+        -0.0026321199087024905,
+        0.06584534932408503,
+        0.0026381843091716206
+      ],
+      "blade_peduncle_angle_deg": 88.4162160119543
+    },
+    {
+      "label": "target",
+      "q_rad": [
+        1.7142916078183,
+        -0.38916121319297714,
+        1.58247325385297,
+        1.9716344796544494,
+        1.4273010457707116,
+        -1.2217305471465851
+      ],
+      "tcp_world_m": [
+        1.197275068385659,
+        -0.7471741490892482,
+        2.078119116680865
+      ],
+      "tcp_sdk_base_m": [
+        0.054716475333527415,
+        0.7431741490892486,
+        0.43424011668086515
+      ],
+      "blade_plane_tilt_from_horizontal_deg": 70.00000395040055,
+      "camera_above_tcp_m": 0.03510275961142549,
+      "cut_point_error_m": 0.03435735799537556,
+      "cut_point_error_world_m": [
+        -0.002632183937681054,
+        -0.034154629531217284,
+        0.0026383589077134673
+      ],
+      "blade_peduncle_angle_deg": 88.41621079138194
+    }
+  ],
+  "sdk_fk_verification": {
+    "sdk_library": "/data/robot_SDK/新版SDK/aubo_sdk-2.5.0-linux64.bf7070c/lib/libaubo_sdk.so.2.5.0",
+    "sdk_sha256": "a04ad0aa05b2d46fea5a863fe30698950e6434afeafd5a3eaf605c3f0df0ff1b",
+    "samples": 102,
+    "urdf_wrist_minus_sdk_position_min_m": [
+      -3.3306690738754696e-16,
+      -2.220446049250313e-16,
+      0.023499999999999854
+    ],
+    "urdf_wrist_minus_sdk_position_max_m": [
+      3.885780586188048e-16,
+      2.7755575615628914e-16,
+      0.023500000000000132
+    ],
+    "rotation_matrix_max_absolute_error": 8.326672684688674e-16
+  },
+  "vision_pick_error_m": 0.003918385061787464,
+  "skeleton_points": 22,
+  "sdk_calibration_output": "/data/tomato_gazebo/ros2_gazebo_ws/validation/stage2/calibration_sdk",
+  "unit_tests_passed": 53,
+  "built_packages": 9,
+  "sdk_live_status": {
+    "pose_reference": "sdk_flange",
+    "verification": "live ArmStatus compared against simultaneous joint-state SDK FK",
+    "position_reported_m": [
+      0.3360215223453532,
+      -0.06792703668970435,
+      0.4112399308471935
+    ],
+    "position_expected_m": [
+      0.33602152234773935,
+      -0.06792703669023437,
+      0.41123993084758664
+    ],
+    "position_error_m": 2.4757159768002063e-12,
+    "joint_degrees": [
+      10.318372850979129,
+      15.373730329667803,
+      134.0537115981857,
+      117.04930832335168,
+      86.6359628186348,
+      0.0006207799687564621
+    ],
+    "motion_executed": false
+  },
+  "native_controller_complete_cycles": 0
+}

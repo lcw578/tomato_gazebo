@@ -2,7 +2,9 @@
 
 ## 当前验收结果
 
-真值驱动采摘完成两轮局部重置复测，两轮均经过实际刀片接触、严格闭爪、持果运输、动态释放和全果实体筐内静置。原样真机主控已经独立启动并收到真实 GT 识别服务响应，向 `/move_to_pose` 发送请求后取得 `30003` 逆解失败。完整原主控采摘入筐成功周期为 0，3–5 次重复验收仍待末端安装坐标基准核实。[本轮实测汇总](/data/tomato_gazebo/ros2_gazebo_ws/docs/evidence/stage2_harvest_2026-11-20.json)
+真值驱动采摘完成两轮局部重置复测，两轮均经过实际刀片接触、严格闭爪、持果运输、动态释放和全果实体筐内静置。原样真机主控首次运行收到 GT 识别响应后，在 `/move_to_pose` 取得 `30003` 逆解失败。后续核对发现仿真桥接的 TCP 解释与硬件 SDK 法兰接口有差异，已增加 SDK 对齐模式并同步相机外参。该模式下原请求的中间点和目标点离线逆解通过，在线法兰位置反馈与关节 FK 一致。[首轮实测汇总](/data/tomato_gazebo/ros2_gazebo_ws/docs/evidence/stage2_harvest_2026-11-20.json) · [SDK 对齐核验](/data/tomato_gazebo/ros2_gazebo_ws/docs/evidence/stage2_wrist_reference_2026-11-20.json)
+
+SDK 对齐后尚未执行新的原主控运动周期。当前模型复算的刀口距剪切点为 34.3574 mm，刀片法向与果梗轴线夹角为 88.4162°，仍超出 5 mm 与 30° 的剪切条件。完整原主控采摘入筐成功周期为 0，3–5 次重复验收待完成。
 
 ## 执行基准
 
@@ -133,29 +135,45 @@ python3 scripts/stage2_harvest_checks.py
 
 ### 原主控姿态与剪刀坐标核对
 
-同一组图像经原函数处理后产生 `mid2target_angle=0`，RPY 为 `[90°,70°,180°]`，机械臂基座系请求坐标为 `[0.0486071,0.6072222,0.4552814] m`，包含 0.10 m 夹具长度补偿。当前桥接恢复的 TCP 目标为 `[0.0486071,0.7072222,0.4552814] m`。
+首次测试的图像经原函数处理后产生 `mid2target_angle=0`，RPY 为 `[90°,70°,180°]`，URDF 基座系请求坐标为 `[0.0486071,0.6072222,0.4552814] m`，包含 0.10 m 夹具长度补偿。当时桥接恢复的 TCP 目标为 `[0.0486071,0.7072222,0.4552814] m`。
 
-按当前桥接的 TCP 朝向解释，刀具切向与果梗夹角为 85.6449°。按 SDK 法兰朝向并组合现有刀座安装旋转计算，夹角为 88.4162°。剪切判据要求夹角小于等于 30°。实际启动原样主控后，日志记录了同一组请求，运动服务在中间点逆解阶段返回 `30003`。中间点所需 wrist3 位置为机械臂底座系 `[0.04279655,0.74317419,0.45218180] m`。多初始种子离线逆解也未得到解。末端安装旋转及 SDK TCP 配置仍需真机依据。[原样主控日志](/data/tomato_gazebo/ros2_gazebo_ws/validation/stage2/vision/native_main.log:88) · [运动服务日志](/data/tomato_gazebo/ros2_gazebo_ws/validation/stage2/motion_service_native.log:1) · [主控固定俯仰](/data/tomato_gazebo/robot_ws_fixed-v1.0-master/src/xc_robot_main_control/xc_robot_main_control/xc_robot_main_control_node.py:1416) · [硬件姿态转换](/data/tomato_gazebo/robot_ws_fixed-v1.0-master/src/xc_aubo_arm_control/src/motion_service.cpp:1069) · [SDK 法兰接口说明](/data/tomato_gazebo/robot_ws_fixed-v1.0-master/src/xc_aubo_arm_control/include/aubo_sdk/serviceinterface.h:605)
+按该 TCP 朝向解释，刀片法向与果梗轴线夹角为 85.6449°。实际启动原样主控后，日志记录了同一组请求，运动服务在中间点逆解阶段返回 `30003`。当时中间点所需 wrist3 位置为机械臂底座系 `[0.04279655,0.74317419,0.45218180] m`，多初始种子离线逆解也未得到解。这是提交 `214c268` 时的历史失败记录。[原样主控日志](/data/tomato_gazebo/ros2_gazebo_ws/validation/stage2/vision/native_main.log:88) · [运动服务日志](/data/tomato_gazebo/ros2_gazebo_ws/validation/stage2/motion_service_native.log:1)
 
-![剪刀与果梗朝向](/data/tomato_gazebo/ros2_gazebo_ws/validation/stage2/visuals/cutter_direction_comparison.png)
+硬件 `create_waypoint` 将请求 XYZ 直接作为 SDK 法兰位置，并将 RPY 及归一化后的进刀角直接传给 SDK 逆解。仿真现提供 `pose_reference=sdk_flange` 复现该接口，包括两侧中间点和特殊角度分支。该模式下 `/arm_status` 也使用 SDK 法兰坐标。[硬件路径](/data/tomato_gazebo/robot_ws_fixed-v1.0-master/src/xc_aubo_arm_control/src/motion_service.cpp:1022) · [SDK 法兰接口说明](/data/tomato_gazebo/robot_ws_fixed-v1.0-master/src/xc_aubo_arm_control/include/aubo_sdk/serviceinterface.h:605) · [仿真桥接](/data/tomato_gazebo/ros2_gazebo_ws/src/tomato_sim_adapters/tomato_sim_adapters/sim_aubo_motion_service.py:60)
 
-### 需要真机提供的直观参考
+官方 SDK 动态库与 URDF 的 102 组关节 FK 对照显示，URDF wrist3 位置恒比 SDK 法兰位置高 23.5 mm，旋转矩阵最大元素误差为 `8.33e-16`。仿真在运动和相机标定两端均按基座 Z 轴处理该偏移。运行中的法兰位置反馈与同时采样关节 FK 的位置差为 `2.48e-12 m`。该在线检查采用静止机械臂。[运动学转换](/data/tomato_gazebo/ros2_gazebo_ws/src/tomato_sim_adapters/tomato_sim_adapters/arm_kinematics.py:56) · [标定转换](/data/tomato_gazebo/ros2_gazebo_ws/scripts/prepare_phase4_calibration.py:18) · [原始 SDK 对照](/data/tomato_gazebo/ros2_gazebo_ws/validation/stage2/sdk_wrist_frame_verification.json)
 
-先提供一张同时看到机械臂手腕、剪刀固定座和刀片的侧面照片，便于核对现有 CAD 的装配关系。若有 AUBO 工具配置页面，再提供该页面中工具位置和旋转值。当前 CAD 的法兰至刀座旋转为 `[180°,0°,90°]`，而旧真机 URDF 使用简化夹具模型，无法据此恢复刀片的实际方向。[CAD 安装旋转](/data/tomato_gazebo/ros2_gazebo_ws/src/tomato_sim_description/urdf/mujoco_cad.xacro:540)
+SDK 基座下的新曝光经过原视觉函数得到请求 `[0.0486071,0.6072222,0.4317814] m`，RPY 为 `[90°,70°,180°]`。中间点 `[0.0486071,0.5072222,0.4317814] m` 和目标点的逆解均通过。真实服务回调的单元测试覆盖完整中间点及目标点求解，执行动作由测试替身记录。复算目标刀口世界位置为 `[1.1972751,-0.7471741,2.0781191] m`，剪切点为 `[1.1999073,-0.7130195,2.0754808] m`，位置差 34.3574 mm，刀片法向与果梗轴线夹角 88.4162°。这些端点数值来自离线 FK/IK。[新曝光诊断](/data/tomato_gazebo/ros2_gazebo_ws/validation/stage2/vision/sdk_reference/vision_diagnostic.json) · [接口回归测试](/data/tomato_gazebo/ros2_gazebo_ws/tests/test_sdk_pose.py)
+
+### 用户确认的初始安装关系
+
+用户确认“腕部相机在正上方、刀口水平”对应机械臂初始位姿，其他姿态允许随手腕旋转。本轮将“水平”按两片刀片所在平面平行地面核验，并以当前启动关节角 `[10.32,15.37,134.05,117.05,86.63,0]°` 为初始位姿。现有 CAD 在该位姿的刀面倾斜 1.6300°，相机中心高于刀口 TCP 114.0436 mm，基本符合这项描述。采摘请求对应姿态的刀面倾斜约 70°。
+
+现有 CAD 的 wrist3 至刀口偏移为 `[-4.4,-4.9,135.952] mm`，主控按 100 mm 夹具长度补偿。轴向名义差为 35.952 mm，实际剪切点误差还叠加视觉定位和横向安装偏移。需要核对真机手腕参考面至刀口的位置及工具设置，才能确定后续仿真修正量。用户给出的初始安装关系支持当前总体装配方向，精确刀口偏移和采摘姿态下的刀片交角仍待核验。[CAD 安装定义](/data/tomato_gazebo/ros2_gazebo_ws/src/tomato_sim_description/urdf/mujoco_cad.xacro:540) · [本轮几何数据](/data/tomato_gazebo/ros2_gazebo_ws/docs/evidence/stage2_wrist_reference_2026-11-20.json)
 
 原样主控在收到逆解失败后已停止。其 Python 进程在 SIGINT 和 SIGTERM 后仍保留线程，本轮终止了该测试进程，并将 AGV 连续运行参数设为 false。
 
 ## 复现视觉诊断
 
-在运行中的同一 ROS Domain 内启动 1000 count/m 的相机桥接和 GT 服务，然后执行以下诊断命令。
+原主控对接使用 SDK 模式，启动 `phase3.launch.py` 时传入 `pose_reference:=sdk_flange`，单独启动运动服务时传入 `-p pose_reference:=sdk_flange`。默认 `pose_reference=tcp` 服务于原有真值 TCP 驱动配置。相机标定及视觉诊断应选用相同坐标基准。以下命令在运行中的同一 ROS Domain 内执行，采用 1000 count/m 相机桥接和 GT 服务。
 
 ```bash
 source /opt/ros/humble/setup.bash
 source .overlay/install/local_setup.bash
+export ROS_DOMAIN_ID=138 ROS_LOCALHOST_ONLY=1
+python3 scripts/prepare_phase4_calibration.py \
+  validation/stage2/calibration_sdk --pose-reference sdk_flange \
+  --ros-args -p use_sim_time:=true
+```
+
+原主控读取的左右相机标定文件应来自上面的输出目录。视觉诊断按同一基准执行。
+
+```bash
 ROS_DOMAIN_ID=138 ROS_LOCALHOST_ONLY=1 PYTHONDONTWRITEBYTECODE=1 \
   .venv_ros/bin/python scripts/stage2_gt_vision_checks.py \
   --output validation/stage2/vision/recheck \
   --depth-units-per-metre 1000 --gripper-length .10 \
+  --pose-reference sdk_flange \
   --ros-args -p use_sim_time:=true
 ```
 
@@ -165,6 +183,6 @@ ROS_DOMAIN_ID=138 ROS_LOCALHOST_ONLY=1 PYTHONDONTWRITEBYTECODE=1 \
 
 ## 最终代码检查
 
-本轮完整单元测试 44/44 通过，包含阶段一既有 10 项回归。Overlay 构建的 9 个包全部通过，v4 场景完整性检查通过，保留 94 个原始实体和 60 株植株。真机业务目录对基准提交的差异检查为空。
+SDK 对齐后的完整单元测试 53/53 通过，包含阶段一既有 10 项回归。Overlay 构建的 9 个包全部通过。首次阶段二验收时，v4 场景完整性检查通过，保留 94 个原始实体和 60 株植株。真机业务目录对基准提交的差异检查为空。
 
 Gazebo 固定关节合并后，果筐碰撞名包含 `crate_col_*`。接触分类现同时识别该名称和 `basket_link`，回归测试使用现场碰撞名。两轮物理测试的历史接触日志保留原始分类，全果筐内结论来自独立实体位姿与 12 个球的几何检查。

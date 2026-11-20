@@ -33,6 +33,7 @@ def generate_launch_description():
             'active_camera_side': LaunchConfiguration('active_camera_side'),
             'remote_depth_units_per_metre': LaunchConfiguration('remote_depth_units_per_metre'),
             'request_gripper_length': LaunchConfiguration('request_gripper_length'),
+            'pose_reference': LaunchConfiguration('pose_reference'),
             'arm_base_yaw_deg': LaunchConfiguration('arm_base_yaw_deg'),
             'positive_rfid_m': LaunchConfiguration('positive_rfid_m'),
             'negative_rfid_m': LaunchConfiguration('negative_rfid_m'),
@@ -57,6 +58,7 @@ def generate_launch_description():
         DeclareLaunchArgument('active_camera_side', default_value='right'),
         DeclareLaunchArgument('remote_depth_units_per_metre', default_value='4000'),
         DeclareLaunchArgument('request_gripper_length', default_value='0.0'),
+        DeclareLaunchArgument('pose_reference', default_value='tcp'),
         DeclareLaunchArgument(
             'evidence_file', default_value=str(workspace() / 'validation/phase3_runtime.json')),
         DeclareLaunchArgument(

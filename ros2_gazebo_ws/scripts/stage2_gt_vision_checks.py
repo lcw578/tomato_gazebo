@@ -23,6 +23,7 @@ from tf2_ros import Buffer, TransformListener
 from xc_interfaces.srv import MoveToPose, YoloDetection
 
 from tomato_sim_adapters.gt_geometry_projection import transform_matrix
+from tomato_sim_adapters.arm_kinematics import SDK_BASE_Z_OFFSET
 from tomato_sim_adapters.ros_vision_compat import TomatoSimCvBridge
 from tomato_sim_adapters.sim_gt_yolo_service import depth_image_metres
 
@@ -305,6 +306,9 @@ class VisionChecks(Node):
                 [transform.translation.x, transform.translation.y, transform.translation.z],
                 [transform.rotation.x, transform.rotation.y,
                  transform.rotation.z, transform.rotation.w])
+            if args.pose_reference == 'sdk_flange':
+                base_from_optical[2, 3] -= SDK_BASE_Z_OFFSET
+            result['pose_reference'] = args.pose_reference
             arrays['base_from_optical'] = base_from_optical
             result['base_from_optical'] = base_from_optical.tolist()
             base_points, endpoint_depths = [], []
@@ -340,8 +344,10 @@ class VisionChecks(Node):
                     'gripper_length_m': args.gripper_length,
                     'start2mid': request.start2mid, 'mid_to_target': request.mid_to_target}
                 from tomato_sim_adapters.arm_kinematics import ArmKinematics
-                from tomato_sim_adapters.sim_aubo_motion_service import waypoints
-                midpoint, target, rotation = waypoints(request, args.gripper_length)
+                from tomato_sim_adapters.sim_aubo_motion_service import sdk_waypoints, waypoints
+                midpoint, target, rotation = (sdk_waypoints(request)
+                    if args.pose_reference == 'sdk_flange'
+                    else waypoints(request, args.gripper_length))
                 base_from_requested_tcp = np.array([[rotation[row, column]
                     for column in range(3)] for row in range(3)])
                 world_from_base = world_from_optical @ np.linalg.inv(base_from_optical)
@@ -369,6 +375,7 @@ def main():
     parser.add_argument('--camera-root', default='/camera')
     parser.add_argument('--depth-units-per-metre', type=float, default=1000.)
     parser.add_argument('--gripper-length', type=float, default=.10)
+    parser.add_argument('--pose-reference', choices=('tcp', 'sdk_flange'), default='tcp')
     parser.add_argument('--scene-file', type=Path,
                         default=WORKSPACE / 'validation/phase3/phase3_scene.json')
     parser.add_argument('--stem-source', type=Path, default=REAL_CONTROL / 'stemGrowthAndPoints.py')
