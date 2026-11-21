@@ -1,6 +1,12 @@
 # 阶段二采摘闭环验收记录
 
-## 当前实测结果
+## 2026-11-21 零升降单株复测
+
+单株场景将升降平台保持在 0 m，果筐固定在升降平台，目标果串相对旧 v4 位置下移 0.85 m。回筐适配器读取当前果筐 TF，并以当前关节状态求解释放位姿，不再执行旧配置中的四点固定关节绕行。原样主控调用 `/return_to_box` 后约 5.8 s 返回果筐并成功开爪。末端相对 `basket_link` 的释放位姿为 `[0, 0, -0.220] m`。
+
+单次端到端复测 `1/1` 通过。流程到达 `ATTACHED_TO_STEM → HELD_BY_GRIPPER → RELEASED`。验收只要求 12 个果实碰撞球的包络进入果筐内腔，保留 2 mm 数值接触容差，不要求载荷停止运动、静置、速度或姿态稳定。该轮结果为 `inside=true`，最大边界超出量 1.589 mm，落在 2 mm 容差内。剪切点 TCP 误差 3.9701 mm，刀面与果梗交角 1.4098°，夹爪闭合残差最大 0.000231 mm，主茎接触 0 次，滑轨漂移 0.0000203 mm。原主控与 `stemGrowthAndPoints.py` 运行前后哈希一致，完整测试集 71/71 通过。[单轮验收证据](/data/tomato_gazebo/ros2_gazebo_ws/validation/stage2/single_plant_lift_zero/basket_only_acceptance/native_harvest_summary.json) · [回筐路径实现](/data/tomato_gazebo/ros2_gazebo_ws/src/tomato_sim_adapters/tomato_sim_adapters/sim_aubo_motion_service.py:337) · [当前运动配置](/data/tomato_gazebo/ros2_gazebo_ws/src/tomato_sim_gazebo/config/stage2_native_motion.yaml:1)
+
+## 2026-11-20 稳定静置验收结果（历史记录）
 
 2026-11-20，最终代码在受控单株场景完成连续 3/3 轮原样主控物理动作闭环。每轮均经过原视觉函数、实际进刀接触、严格闭爪、携果回筐、原主控成功开爪和动态落筐。原主控及 `stemGrowthAndPoints.py` 运行前后 SHA-256 核验一致。完整单元测试 64/64 通过，overlay 九个包构建通过。[已提交的测量证据](/data/tomato_gazebo/ros2_gazebo_ws/docs/evidence/stage2_native_harvest_2026-11-20.json) · [本地完整原始数据](/data/tomato_gazebo/ros2_gazebo_ws/validation/stage2/native_acceptance/native_harvest_summary.json)
 
@@ -20,6 +26,8 @@
 以上结果对应完整 TCP 平移适配、136 mm 运行时长度、单株合成果梗和 GT 识别。独立单果资产、密植场景及真实 YOLO 的验证范围见下文。原主控内部采摘成功标志存在已确认的注释赋值问题，业务状态处理需要单独解决。[业务状态诊断](/data/tomato_gazebo/robot_ws_fixed-v1.0-master/src/xc_robot_main_control/xc_robot_main_control/xc_robot_main_control_node.py:1975)
 
 ## 完整 TCP 补偿与单株验收配置
+
+以下工具参考、场景参数和稳定静置测量记录对应 2026-11-20 的 0.85 m 升降配置。当前零升降配置与入筐判据见本页的 2026-11-21 复测结果。
 
 用户已授权仿真侧完整 TCP 补偿及单株验收场景。原主控通过运行时参数加载 136 mm 工具长度，运动服务采用 `sdk_flange`、1000 count/m 深度和 `sim_gt_yolo_service`。本轮配置基于提交 `83f69b7`。[主控运行配置](/data/tomato_gazebo/ros2_gazebo_ws/src/tomato_sim_gazebo/config/stage2_native_main.yaml:5) · [运动配置](/data/tomato_gazebo/ros2_gazebo_ws/src/tomato_sim_gazebo/config/stage2_native_motion.yaml:5)
 
@@ -41,15 +49,15 @@
 
 ### 原样主控验收流程
 
-每轮在局部复原后启动原主控进程，由原主控完成识别匹配、骨架提取、两段进刀、闭爪、退刀、回筐和开爪。仲裁器必须记录实际刀片与指定果梗接触、`CUT_SUCCESS`、`HELD_BY_GRIPPER` 和动态 `RELEASED`。验收脚本等待严格到位的开爪事件和原主控“末端执行器打开成功”日志，随后结束该轮主控进程、停止巡航，再等待仲裁器完成动态释放与物理静置。这样每轮物理观察都具有固定的果筐参考系。漂移验收同时覆盖主控动作期间及后续静置窗口。[验收脚本](/data/tomato_gazebo/ros2_gazebo_ws/scripts/stage2_native_harvest_checks.py:82)
+每轮在局部复原后启动原主控进程，由原主控完成识别匹配、骨架提取、两段进刀、闭爪、退刀、回筐和开爪。仲裁器记录实际刀片与指定果梗接触、`CUT_SUCCESS`、`HELD_BY_GRIPPER` 和动态 `RELEASED`。2026-11-20 的历史验收还等待动态释放后的物理静置；当前脚本在释放后轮询果实碰撞体包络，首次确认进入果筐内腔即通过，不等待载荷静止。漂移验收覆盖主控动作至确认入筐。[当前验收脚本](/data/tomato_gazebo/ros2_gazebo_ws/scripts/stage2_native_harvest_checks.py:161)
 
-静置采用连续至少 0.5 s 仿真时间的采样窗口，窗口内任意两帧位置差不超过 1 mm、姿态差不超过 0.5°，每个样本的全部 12 个果球均在筐内。瞬时线速度须小于 0.02 m/s、角速度小于 0.5 rad/s。果球边界检查保留 2 mm 数值接触容差，结果同时记录实际超界量。本轮增加的姿态与窗口门限属于仿真验收选值。[静置检查](/data/tomato_gazebo/ros2_gazebo_ws/scripts/phase3_checks.py:278)
+2026-11-20 历史静置测量采用至少 0.5 s 仿真时间窗口、1 mm 位置跨度、0.5° 姿态跨度、0.02 m/s 线速度和 0.5 rad/s 角速度门限。这些稳定性门限不再用于当前阶段二入筐验收。2 mm 果球包络数值容差仍保留。[历史静置检查](/data/tomato_gazebo/ros2_gazebo_ws/scripts/phase3_checks.py:278)
 
-ODE 接触抖动的 10 s、50 样本专项采样中，位置范围为 `[1.541,0.622,0.0467] mm`，相对起点最大姿态变化 0.204°，瞬时角速度最大 0.273 rad/s、中位数 0.102 rad/s。只用 0.1 rad/s 瞬时角速度门限曾在 120 s 后超时，最终判据采用上述速度上限与位姿范围联合检查。[抖动原始数据](/data/tomato_gazebo/ros2_gazebo_ws/validation/stage2/jitter_probe.json)
+ODE 接触抖动的历史 10 s、50 样本专项采样中，位置范围为 `[1.541,0.622,0.0467] mm`，相对起点最大姿态变化 0.204°，瞬时角速度最大 0.273 rad/s、中位数 0.102 rad/s。只用 0.1 rad/s 瞬时角速度门限曾在 120 s 后超时。这些数据记录了旧静置判据的调试过程，不属于当前入筐门限。[抖动原始数据](/data/tomato_gazebo/ros2_gazebo_ws/validation/stage2/jitter_probe.json)
 
-此前尝试发现过主茎路径干涉、果串搭在筐沿、开爪事件异步观察竞态和删除重建竞态，分别通过仿真路点、释放朝向、等待开爪观察及等待 Gazebo 模型列表确认删除处理。旧的仅线速度静置结果保留为历史数据，最终重复验收使用包含角速度、窗口位姿和逐样本包络的判据。[局部复原](/data/tomato_gazebo/ros2_gazebo_ws/scripts/stage2_reset_payload.py:38) · [回归用例](/data/tomato_gazebo/ros2_gazebo_ws/tests/test_native_acceptance.py)
+此前尝试发现过主茎路径干涉、果串搭在筐沿、开爪事件异步观察竞态和删除重建竞态，分别通过仿真路点、释放朝向、等待开爪观察及等待 Gazebo 模型列表确认删除处理。旧版仅线速度和新版稳定静置结果均作为历史记录保留；当前阶段二验收仅以果实碰撞体进入果筐内腔作为落筐条件。[局部复原](/data/tomato_gazebo/ros2_gazebo_ws/scripts/stage2_reset_payload.py:38) · [回归用例](/data/tomato_gazebo/ros2_gazebo_ws/tests/test_native_acceptance.py)
 
-原主控开爪成功后会恢复巡航。一次复测中，等待仲裁器 `RELEASED` 后才结束主控，造成落筐期间果筐世界 X 移动约 22.3 mm。最终脚本在原主控报告开爪成功后结束本轮进程，并对从主控启动到静置结束的轨道漂移再次设限为 0.5 mm。
+原主控开爪成功后会恢复巡航。一次复测中，等待仲裁器 `RELEASED` 后才结束主控，造成落筐期间果筐世界 X 移动约 22.3 mm。当前脚本在原主控报告开爪成功后结束本轮进程，并对从主控启动到确认入筐的轨道漂移设限为 0.5 mm。
 
 ### 原主控业务成功标志
 

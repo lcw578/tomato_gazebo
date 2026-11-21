@@ -12,7 +12,7 @@
     "plant_instance": "plant_0_8_1",
     "target_truss": "9_1",
     "rail_m": 1.25,
-    "lift_m": 0.5,
+    "lift_m": 0.0,
     "right_camera_angle_deg": 32.0,
     "right_camera_tilt_deg": 25.0,
     "validated": false

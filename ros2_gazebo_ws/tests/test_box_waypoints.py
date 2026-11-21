@@ -1,6 +1,7 @@
 """Configured basket routes use their complete ordered joint trajectory."""
 import types
 import unittest
+from unittest.mock import patch
 
 import numpy as np
 
@@ -58,11 +59,43 @@ class BoxWaypointsTest(unittest.TestCase):
         np.testing.assert_array_equal(executed[1], route)
         self.assertEqual(arm.approach_q, [])
 
-    def test_empty_route_uses_legacy_home_and_box_target(self):
+    def test_empty_route_moves_directly_to_explicit_box_joint_target(self):
         arm, executed = self.arm([])
         response = SimArm.return_box(arm, None, types.SimpleNamespace(result=0))
         self.assertEqual(response.result, 0)
-        np.testing.assert_array_equal(executed[0], [OEM_HOME, arm.box])
+        np.testing.assert_array_equal(executed[0], [arm.box])
+
+    def test_empty_route_solves_current_basket_from_current_joint_state(self):
+        arm, executed = self.arm([])
+        current = np.array([0.2, -0.3, 1.4, 0.8, 1.2, -0.1])
+        target = np.array([0.4, -0.2, 1.1, 1.3, 1.0, 0.2])
+        captured = {}
+
+        class Kinematics:
+            def ik_basket(self, basket_frame, seed):
+                captured['basket_frame'] = basket_frame
+                captured['seed'] = seed.copy()
+                return target
+
+        transform = types.SimpleNamespace(
+            translation=types.SimpleNamespace(x=0.5, y=0.01, z=0.18),
+            rotation=types.SimpleNamespace(x=0.0, y=1.0, z=0.0, w=0.0),
+        )
+        arm.box = None
+        arm.current = lambda: current.copy()
+        arm.kin = Kinematics()
+        arm.tf = types.SimpleNamespace(
+            lookup_transform=lambda *_args: types.SimpleNamespace(transform=transform))
+
+        with patch.object(motion.rclpy.time, 'Time', return_value=None):
+            response = SimArm.return_box(arm, None, types.SimpleNamespace(result=0))
+
+        self.assertEqual(response.result, 0)
+        np.testing.assert_array_equal(captured['seed'], current)
+        np.testing.assert_array_equal(executed[0], [target])
+        self.assertEqual(captured['basket_frame'].p.x(), 0.5)
+        self.assertEqual(captured['basket_frame'].p.y(), 0.01)
+        self.assertEqual(captured['basket_frame'].p.z(), 0.18)
 
 
 if __name__ == '__main__':

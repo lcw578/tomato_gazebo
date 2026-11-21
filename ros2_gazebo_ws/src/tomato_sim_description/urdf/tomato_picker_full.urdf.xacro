@@ -71,7 +71,7 @@
   <xacro:chassis_wheels/>
   <link name="basket_link"><xacro:basket_cad/></link>
   <joint name="basket_mount" type="fixed">
-    <parent link="chassis_cad_datum"/>
+    <parent link="lift_platform"/>
     <child link="basket_link"/>
     <xacro:basket_origin/>
   </joint>

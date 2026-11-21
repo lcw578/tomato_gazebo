@@ -348,8 +348,8 @@ class SimArm(Node):
                     p, q = transform.translation, transform.rotation
                     base_from_basket = kdl.Frame(
                         kdl.Rotation.Quaternion(q.x, q.y, q.z, q.w), kdl.Vector(p.x, p.y, p.z))
-                    target = self.kin.ik_basket(base_from_basket, OEM_HOME)
-                points = [OEM_HOME, target]
+                    target = self.kin.ik_basket(base_from_basket, self.current())
+                points = [target]
             self.execute(points)
             self.midpoint_q = None
         except (ValueError, RuntimeError, TransformException) as error:

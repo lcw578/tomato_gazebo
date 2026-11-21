@@ -34,6 +34,13 @@ def read_json(path):
         return {}
 
 
+def payload_in_basket(state, containment_check):
+    containment = containment_check(state)
+    if not containment['inside']:
+        return None
+    return {'state': state, 'containment': containment}
+
+
 @contextmanager
 def process(command, log_path, hard_stop=False):
     """Stop only this runner's process group, including ROS console wrappers."""
@@ -151,13 +158,15 @@ class NativeHarvestChecks(Phase3Checks):
                         (rotation.inv().apply(position - origin),
                          (rotation.inv() * attitude).as_quat()))
 
-                state, settling = self.settled_payload(
-                    timeout=120, model_name=result['release']['model_name'],
-                    containment_check=check_containment)
-                containment = check_containment(state)
-                result.update(basket_containment=containment, settling=settling,
+                in_basket = self.wait_for(
+                    lambda: payload_in_basket(
+                        self.entity_state(result['release']['model_name']), check_containment),
+                    'fruit entering basket', timeout=120)
+                containment = in_basket['containment']
+                result.update(basket_containment=containment,
                               final_runtime=read_json(runtime),
-                              rail_drift_through_settling_m=max(self.rail_samples)-min(self.rail_samples))
+                              rail_drift_through_containment_m=(
+                                  max(self.rail_samples) - min(self.rail_samples)))
             log = (folder / 'native_main.log').read_text(errors='replace')
             result['original_skeleton_point_counts'] = [int(value) for value in re.findall(
                 r'提取到的骨骼点数量:\s*(\d+)', log)]
@@ -177,7 +186,7 @@ class NativeHarvestChecks(Phase3Checks):
                 and any(event.get('event') == 'CUT_SUCCESS'
                         for event in result['held']['cut_attempts'])
                 and result['rail_drift_m'] < .0005
-                and result['rail_drift_through_settling_m'] < .0005
+                and result['rail_drift_through_containment_m'] < .0005
                 and result['test_result_2'] and result['native_return_to_box_succeeded']
                 and result['native_gripper_open_succeeded']
                 and result['original_skeleton_point_counts']
@@ -223,11 +232,10 @@ def main():
     try:
         parameters = yaml.safe_load(args.motion_config.read_text())['/**']['ros__parameters']
         names = ['pose_reference', 'request_gripper_length', 'compensate_native_tool_offset',
-                 'pick_waypoints_rad', 'box_waypoints_rad']
+                 'pick_waypoints_rad']
         client = node.create_client(GetParameters, '/sim_aubo_motion_service/get_parameters')
         response = node.call(client, GetParameters.Request(names=names), 'motion configuration')
-        fields = ['string_value', 'double_value', 'bool_value',
-                  'double_array_value', 'double_array_value']
+        fields = ['string_value', 'double_value', 'bool_value', 'double_array_value']
         actual = {name: getattr(value, field)
                   for name, value, field in zip(names, response.values, fields)}
         for name in names:
@@ -236,6 +244,12 @@ def main():
                     raise RuntimeError(f'Loaded motion route differs from {args.motion_config}')
             elif actual[name] != parameters[name]:
                 raise RuntimeError(f'Loaded motion parameter differs from configuration: {name}')
+        configured_route = parameters.get('box_waypoints_rad', [])
+        if configured_route:
+            response = node.call(
+                client, GetParameters.Request(names=['box_waypoints_rad']), 'basket route')
+            if list(response.values[0].double_array_value) != configured_route:
+                raise RuntimeError(f'Loaded basket route differs from {args.motion_config}')
         if (actual['pose_reference'] != 'sdk_flange'
                 or not actual['compensate_native_tool_offset']
                 or actual['request_gripper_length'] != .136):

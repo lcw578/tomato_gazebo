@@ -216,6 +216,7 @@ class VisionChecks(Node):
         masks = [bridge.imgmsg_to_cv2(mask.mask, 'mono8') for mask in response.masks]
         result['detections'] = [{'class_id': int(response.class_ids[index]),
                                  'class_name': name,
+                                 'confidence': float(response.confidences[index]),
                                  'bbox_xyxy': list(response.bboxes[4*index:4*index+4]),
                                  'mask_pixels': int(np.count_nonzero(masks[index])),
                                  'mask_metadata_aligned': (

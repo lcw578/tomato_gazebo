@@ -5,12 +5,18 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import json
 
 WORKSPACE = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(WORKSPACE / 'scripts'))
 
 
 class ConfigurationTest(unittest.TestCase):
+    def test_harvest_station_defaults_to_zero_lift(self):
+        config = json.loads((WORKSPACE / 'src/tomato_sim_gazebo/config/'
+                             'simulation_baseline.json').read_text())
+        self.assertEqual(config['candidate_harvest_station']['lift_m'], 0.0)
+
     def test_missing_external_weight_is_rejected_before_build(self):
         with tempfile.TemporaryDirectory() as directory:
             missing_weight = Path(directory) / 'missing.pt'

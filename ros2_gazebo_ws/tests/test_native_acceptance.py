@@ -140,6 +140,25 @@ class NativeAcceptanceTest(unittest.TestCase):
         self.assertGreaterEqual(result['sample_sim_time_s'], 1.5)
         self.assertTrue(all(sample['containment']['inside'] for sample in result['samples']))
 
+    def test_native_basket_acceptance_ignores_payload_motion(self):
+        path = WORKSPACE / 'scripts/stage2_native_harvest_checks.py'
+        method = load_method(path, 'payload_in_basket', {})
+        state = types.SimpleNamespace(twist=types.SimpleNamespace(linear=object(), angular=object()))
+        containment = {'inside': True, 'sphere_count': 12}
+
+        result = method(state, lambda observed: containment)
+
+        self.assertIs(result['state'], state)
+        self.assertEqual(result['containment'], containment)
+
+    def test_native_basket_acceptance_rejects_payload_outside_basket(self):
+        path = WORKSPACE / 'scripts/stage2_native_harvest_checks.py'
+        method = load_method(path, 'payload_in_basket', {})
+
+        result = method(types.SimpleNamespace(), lambda _: {'inside': False})
+
+        self.assertIsNone(result)
+
     def test_explicit_launch_switch_overrides_native_configuration(self):
         namespace = {'LaunchConfiguration': LaunchConfiguration, 'ParameterValue': ParameterValue,
                      'Node': Node, 'use_time': {'use_sim_time': True}}
